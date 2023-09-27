@@ -5,54 +5,31 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"main.go/opcodes"
 )
 
-func main() {
-	ebiten.SetWindowSize(640, 320)
-	ebiten.SetWindowTitle("Chip8 Emulator")
-	ebiten.RunGame(&Game{})
-	if err := ebiten.RunGame(&Game{}); err != nil {
-		log.Fatal(err)
-	}
-
+type Game struct{
+	cpu *opcodes.Cpu
 }
 
-type Game struct{}
-
 func (g *Game) Update() error {
-	return nil
+    return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	ebitenutil.DebugPrint(screen, "Hello, World!")
+    ebitenutil.DebugPrint(screen, "Hello, World!")
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 640, 320
+    return 640, 320
 }
 
-/*type chip8 struct {
-	memory    [4096]uint8
-	registers [16]uint8
-	screen    [64 * 32]uint8
-	keys      [16]uint8
-}
+func main() {
+    ebiten.SetWindowSize(640, 320)
+    ebiten.SetWindowTitle("Chip8 Emulator")
+    ebiten.RunGame(&Game{})
+    if err := ebiten.RunGame(&Game{}); err != nil {
+        log.Fatal(err)
+    }
 
-var chip8_hex_font = [80]uint8{
-	0xF0, 0x90, 0x90, 0x90, 0xF0,
-	0x20, 0x60, 0x20, 0x20, 0xF0,
-	0xF0, 0x10, 0xF0, 0x80, 0xF0,
-	0xF0, 0x10, 0xF0, 0x10, 0xF0,
-	0x90, 0x90, 0xF0, 0x10, 0x10,
-	0xF0, 0x80, 0xF0, 0x10, 0xF0,
-	0xF0, 0x80, 0xF0, 0x90, 0xF0,
-	0xF0, 0x10, 0x20, 0x40, 0x40,
-	0xF0, 0x90, 0xF0, 0x90, 0xF0,
-	0xF0, 0x90, 0xF0, 0x10, 0x10,
-	0xF0, 0x90, 0xF0, 0x90, 0x90,
-	0xE0, 0x90, 0xE0, 0x90, 0xE0,
-	0xF0, 0x80, 0x80, 0x80, 0xF0,
-	0xE0, 0x90, 0x90, 0x90, 0xE0,
-	0xF0, 0x80, 0xF0, 0x80, 0xF0,
-	0xF0, 0x80, 0xF0, 0x80, 0x80}
-*/
+}
