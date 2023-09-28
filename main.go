@@ -31,14 +31,12 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 func main() {
 	filename := os.Args[1]
 	rombytes := readROM(filename)
+	fmt.Println(rombytes)
 	PrintROM(rombytes)
 
 	var game Game
 	opcodes.InitCpu(&game.cpu, rombytes)
-
-    for i:=0; i < int(game.cpu.Romlength); i++ {
-
-    }
+	fmt.Println(game.cpu.Memory)
 
 	// ebiten.SetWindowSize(640, 320)
 	// ebiten.SetWindowTitle("Chip8 Emulator")
@@ -47,6 +45,17 @@ func main() {
 	// 	log.Fatal(err)
 	// }
 
+}
+
+func charToHex(c rune) byte {
+	switch {
+	case c >= 48 && c <= 57:
+		return byte(c - 48)
+	case c >= 65 && c <= 70:
+		return byte(c - 55)
+	default:
+		panic(fmt.Sprint("Bad Hex character: %i", c))
+	}
 }
 
 func readROM(filename string) []byte {
