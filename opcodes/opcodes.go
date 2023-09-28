@@ -59,6 +59,11 @@ func (c *Cpu) uint16ToUint8(n uint16) (uint8, uint8) {
 	return uint8(n >> 8), uint8(n & 0x00FF)
 }
 
+// unit 8 to uint16
+func (c *Cpu) uint8ToUint16(n1 uint8, n2 uint8) uint16 {
+	return uint16(n1)<<8 | uint16(n2)
+}
+
 // Fonction uint8 to uint4
 func (c *Cpu) uint8ToUint4(n uint8) (uint8, uint8) {
 	return uint8(n >> 4), uint8(n & 0x0F)
