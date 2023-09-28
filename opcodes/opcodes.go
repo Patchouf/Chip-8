@@ -19,7 +19,7 @@ type Cpu struct {
 }
 
 type Object struct {
-	clavier [16]byte
+	Clavier [16]byte
 }
 
 func InitCpu(cpu *Cpu, rombytes []byte) {
@@ -78,6 +78,47 @@ func (c *Cpu) uint8ToUint4(n uint8) (uint8, uint8) {
 	return uint8(n >> 4), uint8(n & 0x0F)
 }
 
+func (c *Cpu) drawSprite(VX, VY, height byte) bool {
+	startX := uint16(c.Registre[VX])
+	startY := uint16(c.Registre[VY])
+
+	c.Registre[0xF] = 0
+
+	// Parcourez les lignes du sprite.
+	for row := byte(0); row < height; row++ {
+		// Récupérez le byte de données du sprite depuis la mémoire à l'adresse I.
+		spriteByte := c.Memory[c.I+uint16(row)]
+
+		// Parcourez les bits du byte du sprite (de gauche à droite).
+		for bit := byte(0); bit < 8; bit++ {
+			// Vérifiez si le pixel actuel du sprite est activé (1).
+			if (spriteByte & (0x80 >> bit)) != 0 {
+				// Calculez les coordonnées de l'écran pour le pixel actuel.
+				x := int(startX) + int(bit)
+				y := int(startY) + int(row)
+
+				// Assurez-vous que les coordonnées sont valides (l'écran du Chip-8 est de 64x32 pixels).
+				if x < 64 && y < 32 {
+					// Obtenez l'index de l'écran correspondant à ces coordonnées.
+					index := y*64 + x
+
+					// Vérifiez si le pixel à l'écran est déjà activé (XOR).
+					if c.Gfx[index] == 1 {
+						// Il y a une collision, donc définissez le Registre VF (carry) à 1.
+						c.Registre[0xF] = 1
+					}
+
+					// Activez ou désactivez le pixel en utilisant l'opération XOR.
+					c.Gfx[index] ^= 1
+				}
+			}
+		}
+	}
+
+	// Indiquez s'il y a eu une collision (true) ou non (false).
+	return c.Registre[0xF] == 1
+}
+
 // Decode décode un opcode et exécute l'instruction correspondante.
 func (c *Cpu) decode(opcode uint16) {
 	// Diviser l'opcode en parties individuelles
@@ -134,7 +175,7 @@ func (c *Cpu) decode(opcode uint16) {
 		// Gérer les opcodes 8XY0 à 8XYE
 		switch opcodeN4 {
 		case 0x0:
-			// Opcode 8XY0 - Copie de registre
+			// Opcode 8XY0 - Copie de Registre
 			c.Registre[opcodeN4] = c.Registre[opcodeN4]
 		case 0x1:
 			// Opcode 8XY1 - Opération OU (bitwise OR)
@@ -176,6 +217,9 @@ func (c *Cpu) decode(opcode uint16) {
 		c.Registre[opcodeN4] = byte(rand.Int()*256) & byte(opcodeNNN)
 	case 0xD:
 		// Opcode DXYN - Dessin à l'écran
+		// Gérer l'opcode DXYN ici
+		c.drawSprite(opcodeN4, opcodeN4, opcodeN4)
+		break
 
 	case 0xE:
 		// Gérer les opcodes EX9E et EXA1

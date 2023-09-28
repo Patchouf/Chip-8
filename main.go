@@ -1,11 +1,12 @@
 package main
 
 import (
+
+	// "./opcodes/opcodes"
+
 	"fmt"
 	"io/ioutil"
 	"os"
-
-	// "./opcodes/opcodes"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -31,12 +32,12 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 func main() {
 	filename := os.Args[1]
 	rombytes := readROM(filename)
-	fmt.Println(rombytes)
-	PrintROM(rombytes)
+	// fmt.Println(rombytes)
+	// PrintROM(rombytes)
 
 	var game Game
 	opcodes.InitCpu(&game.cpu, rombytes)
-	fmt.Println(game.cpu.Memory)
+	// fmt.Println(game.cpu.Memory)
 
 	// ebiten.SetWindowSize(640, 320)
 	// ebiten.SetWindowTitle("Chip8 Emulator")
