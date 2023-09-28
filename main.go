@@ -17,7 +17,7 @@ type Game struct {
 
 func (g *Game) Update() error {
 	g.cpu.Update()
-	time.Sleep(time.Second)
+	time.Sleep(time.Millisecond)
 	return nil
 }
 
