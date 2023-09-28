@@ -32,7 +32,7 @@ func (cpu *Cpu) Update() {
 	op1 := cpu.Memory[cpu.Pc]
 	op2 := cpu.Memory[cpu.Pc]
 	opcode := cpu.uint8ToUint16(op1, op2)
-	cpu.Decode(opcode)
+	cpu.decode(opcode)
 }
 
 func (cpu *Cpu) loadROM(rombytes []byte) {
