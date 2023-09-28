@@ -19,11 +19,20 @@ type Cpu struct {
 }
 
 type Object struct {
-	clavier [16]byte
+	Clavier [16]byte
 }
 
 func InitCpu(cpu *Cpu, rombytes []byte) {
 	cpu.loadROM(rombytes)
+	cpu.Pc = 0x200 - 2
+}
+
+func (cpu *Cpu) Update() {
+	cpu.Pc += 2
+	op1 := cpu.Memory[cpu.Pc]
+	op2 := cpu.Memory[cpu.Pc]
+	opcode := cpu.uint8ToUint16(op1, op2)
+	cpu.decode(opcode)
 }
 
 func (cpu *Cpu) loadROM(rombytes []byte) {
@@ -52,6 +61,11 @@ func (c *Cpu) stackPush(address uint16) {
 	}
 	c.Stack[c.Sp] = address
 	c.Sp++
+}
+
+// Fonction uint8 to uint16
+func (c *Cpu) uint8ToUint16(n uint8, m uint8) uint16 {
+	return uint16(n) << 8 | uint16(m & 0x00FF)
 }
 
 // Fonction uint16 to uint8
