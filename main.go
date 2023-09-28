@@ -59,17 +59,6 @@ func main() {
 
 }
 
-func charToHex(c rune) byte {
-	switch {
-	case c >= 48 && c <= 57:
-		return byte(c - 48)
-	case c >= 65 && c <= 70:
-		return byte(c - 55)
-	default:
-		panic(fmt.Sprint("Bad Hex character: %i", c))
-	}
-}
-
 func readROM(filename string) []byte {
 	dat, err := ioutil.ReadFile(filename)
 	if err != nil {
