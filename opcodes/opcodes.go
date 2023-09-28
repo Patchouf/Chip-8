@@ -10,7 +10,7 @@ type Cpu struct {
 	Registre    [16]byte
 	I           uint16
 	Pc          uint16
-	Gfx         [64 * 32]byte
+	Gfx         [64][32]byte
 	Delay_timer byte
 	Stack       [16]uint16
 	Sp          byte
@@ -45,7 +45,7 @@ func (c *Cpu) stackPop() (uint16, error) {
 }
 
 // Fonction stackPush
-func (c *Cpu) stackPush(address uint16) {
+func (c *Cpu) StackPush(address uint16) {
 	// Vérifiez que le pointeur de pile (SP) est dans la plage valide (0-15).
 	if c.Sp >= 15 {
 		return
@@ -55,65 +55,78 @@ func (c *Cpu) stackPush(address uint16) {
 }
 
 // Fonction uint16 to uint8
-func (c *Cpu) uint16ToUint8(n uint16) (uint8, uint8) {
+func (c *Cpu) Uint16ToUint8(n uint16) (uint8, uint8) {
 	return uint8(n >> 8), uint8(n & 0x00FF)
 }
 
 // Fonction uint8 to uint4
-func (c *Cpu) uint8ToUint4(n uint8) (uint8, uint8) {
+func (c *Cpu) Uint8ToUint4(n uint8) (uint8, uint8) {
 	return uint8(n >> 4), uint8(n & 0x0F)
 }
 
-func (c *Cpu) drawSprite(VX, VY, height byte) bool {
-	startX := uint16(c.Registre[VX])
-	startY := uint16(c.Registre[VY])
+// func (c *Cpu) DrawSprite(X, Y, height byte) bool {
+// 	ScreenWidth := uint16(c.Registre[X])
+// 	ScreenHeight := uint16(c.Registre[Y])
 
-	c.Registre[0xF] = 0
+// 	c.Registre[0xF] = 0
 
-	// Parcourez les lignes du sprite.
-	for row := byte(0); row < height; row++ {
-		// Récupérez le byte de données du sprite depuis la mémoire à l'adresse I.
-		spriteByte := c.Memory[c.I+uint16(row)]
+// 	// Parcourez les lignes du sprite.
+// 	for row := byte(0); row < height; row++ {
+// 		spriteByte := c.Memory[c.I+uint16(row)]
 
-		// Parcourez les bits du byte du sprite (de gauche à droite).
-		for bit := byte(0); bit < 8; bit++ {
-			// Vérifiez si le pixel actuel du sprite est activé (1).
-			if (spriteByte & (0x80 >> bit)) != 0 {
-				// Calculez les coordonnées de l'écran pour le pixel actuel.
-				x := int(startX) + int(bit)
-				y := int(startY) + int(row)
+// 		for bit := byte(0); bit < 8; bit++ {
 
-				// Assurez-vous que les coordonnées sont valides (l'écran du Chip-8 est de 64x32 pixels).
-				if x < 64 && y < 32 {
-					// Obtenez l'index de l'écran correspondant à ces coordonnées.
-					index := y*64 + x
+// 			if (spriteByte & (0x80 >> bit)) != 0 {
 
-					// Vérifiez si le pixel à l'écran est déjà activé (XOR).
-					if c.Gfx[index] == 1 {
-						// Il y a une collision, donc définissez le Registre VF (carry) à 1.
-						c.Registre[0xF] = 1
-					}
+// 				x := int(ScreenWidth) + int(bit)
+// 				y := int(ScreenHeight) + int(row)
 
-					// Activez ou désactivez le pixel en utilisant l'opération XOR.
-					c.Gfx[index] ^= 1
-				}
-			}
+// 				if x < 64 && y < 32 {
+
+// 				 	index := y*64 + x
+
+// 				 	 if c.Gfx[index] == 1 {
+
+// 				 	 	c.Registre[0xF] = 1
+// 				 	}
+// 				 	 c.Gfx[index] ^= 1
+// 				 }
+// 			}
+// 		}
+// 	}
+
+//		return c.Registre[0xF] == 1
+//	}
+func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
+	erased := false
+	yIndex := y % 64
+
+	for i := x; i < x+8; i++ {
+		xIndex := i % 32
+
+		wasSet := c.Gfx[xIndex][yIndex] == 1
+		value := row >> (x + 8 - i - 1) & 1
+
+		c.Gfx[xIndex][yIndex] ^= value
+
+		if wasSet && c.Gfx[xIndex][yIndex] == 0 {
+			erased = true
 		}
 	}
 
-	// Indiquez s'il y a eu une collision (true) ou non (false).
-	return c.Registre[0xF] == 1
+	return erased
 }
 
 // Decode décode un opcode et exécute l'instruction correspondante.
-func (c *Cpu) decode(opcode uint16) {
-	// Diviser l'opcode en parties individuelles
-	opcodeN := (opcode >> 12) & 0x000F // 4 premiers bits
-	// opcodeX := (opcode >> 8) & 0x000F   // Bits 8 à 11
-	// opcodeY := (opcode >> 4) & 0x000F   // Bits 4 à 7
-	opcodeNNN := opcode & 0x0FFF // Bits 0 à 11
+func (c *Cpu) Decode(opcode uint16) {
+	// Diviser l'opcode en parties individuelles PROBLEME
+	opcodeN := byte(opcode >> 12 & 0x000F) // 4 premiers bits
+	opcodeX := byte(opcode >> 8 & 0x000F)  // Bits 8 à 11
+	opcodeY := byte(opcode >> 4 & 0x000F)  // Bits 4 à 7
+	opcodeNNN := opcode & 0x0FFF           // Bits 0 à 11
 	// opcodeKK := uint8(opcode & 0x00FF) // Bits 0 à 7
 	opcodeN4 := uint8(opcode & 0x000F) // 4 derniers bits
+	//x := byte(opcodeX & )
 
 	// Utilisez un switch pour gérer chaque opcode
 	switch opcodeN {
@@ -121,9 +134,7 @@ func (c *Cpu) decode(opcode uint16) {
 		switch opcode {
 		case 0x00E0:
 			// Opcode 00E0 - Effacer l'écran
-			for i := range c.Gfx {
-				c.Gfx[i] = 0
-			}
+			c.op00E0()
 		case 0x00EE:
 			// Opcode 00EE - Retour de sous-routine
 			c.stackPop()
@@ -132,10 +143,10 @@ func (c *Cpu) decode(opcode uint16) {
 		}
 	case 0x1:
 		// Opcode 1NNN - Saut
-		c.Pc = opcodeNNN
+		c.op1nnn(uint16(opcodeN))
 	case 0x2:
 		// Opcode 2NNN - Appel de sous-routine
-		c.stackPush(c.Pc)
+		c.StackPush(c.Pc)
 	case 0x3:
 		// Opcode 3XNN - Saut conditionnel (égal)
 		if c.Registre[opcodeN4] == byte(opcodeNNN) {
@@ -153,7 +164,8 @@ func (c *Cpu) decode(opcode uint16) {
 		}
 	case 0x6:
 		// Opcode 6XNN - Chargement de valeur constante
-		c.Registre[opcodeN4] = byte(opcodeNNN)
+		c.op6XNN(opcodeX, opcodeN)
+		// c.Registre[opcodeN4] = byte(opcodeNNN)
 	case 0x7:
 		// Opcode 7XNN - Ajout de valeur constante
 		c.Registre[opcodeN4] += byte(opcodeNNN)
@@ -194,17 +206,18 @@ func (c *Cpu) decode(opcode uint16) {
 		}
 	case 0xA:
 		// Opcode ANNN - Chargement de l'index (I)
-		c.I = opcodeNNN
+		// c.I = opcodeNNN
 	case 0xB:
 		// Opcode BNNN - Saut avec offset
-		c.Pc = opcodeNNN + uint16(c.Registre[0])
+		// c.Pc = opcodeNNN + uint16(c.Registre[0])
 	case 0xC:
 		// Opcode CXNN - Génération d'un nombre aléatoire (0 à 255)
 		c.Registre[opcodeN4] = byte(rand.Int()*256) & byte(opcodeNNN)
 	case 0xD:
 		// Opcode DXYN - Dessin à l'écran
+		c.opDxyn(opcodeX, opcodeY, opcodeN)
 		// Gérer l'opcode DXYN ici
-		c.drawSprite(opcodeN4, opcodeN4, opcodeN4)
+		c.DrawSprite(opcodeN4, opcodeN4, opcodeN4)
 		break
 
 	case 0xE:
@@ -243,4 +256,31 @@ func (c *Cpu) decode(opcode uint16) {
 	default:
 		// Gérer les opcodes non pris en charge ou inconnus ici
 	}
+}
+func (c *Cpu) opDxyn(opcodeX, opcodeY, opcodeN byte) {
+	xval := c.Registre[opcodeX]
+	yval := c.Registre[opcodeY]
+	c.Registre[0xF] = 0
+	var i byte = 0
+	for ; i < opcodeN; i++ {
+		row := c.Memory[c.I+uint16(i)]
+		if erased := c.DrawSprite(xval, yval+i, row); erased {
+			c.Registre[0xF] = 1
+		}
+
+	}
+
+}
+func (c *Cpu) op00E0() {
+	for x := 0; x < 64; x++ {
+		for y := 0; y < 32; y++ {
+			c.Gfx[x][y] = 0
+		}
+	}
+}
+func (c *Cpu) op6XNN(opcodeX, opcodeNNN byte) {
+	c.Registre[opcodeX] = opcodeNNN
+}
+func (c *Cpu) op1nnn(address uint16) {
+	c.Pc = address
 }
