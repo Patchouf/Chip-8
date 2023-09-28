@@ -2,10 +2,8 @@ package main
 
 import (
 
-	// "./opcodes/opcodes"
-
 	"fmt"
-	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -33,34 +31,23 @@ func main() {
 	filename := os.Args[1]
 	rombytes := readROM(filename)
 	// fmt.Println(rombytes)
-	// PrintROM(rombytes)
+	PrintROM(rombytes)
 
 	var game Game
 	opcodes.InitCpu(&game.cpu, rombytes)
 	// fmt.Println(game.cpu.Memory)
 
-	// ebiten.SetWindowSize(640, 320)
-	// ebiten.SetWindowTitle("Chip8 Emulator")
-	// ebiten.RunGame(&Game{})
-	// if err := ebiten.RunGame(&Game{}); err != nil {
-	// 	log.Fatal(err)
-	// }
-
-}
-
-func charToHex(c rune) byte {
-	switch {
-	case c >= 48 && c <= 57:
-		return byte(c - 48)
-	case c >= 65 && c <= 70:
-		return byte(c - 55)
-	default:
-		panic(fmt.Sprint("Bad Hex character: %i", c))
+	ebiten.SetWindowSize(640, 320)
+	ebiten.SetWindowTitle("Chip8 Emulator")
+	ebiten.RunGame(&Game{})
+	if err := ebiten.RunGame(&Game{}); err != nil {
+		log.Fatal(err)
 	}
+
 }
 
 func readROM(filename string) []byte {
-	dat, err := ioutil.ReadFile(filename)
+	dat, err := os.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}

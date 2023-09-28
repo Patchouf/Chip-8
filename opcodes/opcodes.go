@@ -30,7 +30,7 @@ func InitCpu(cpu *Cpu, rombytes []byte) {
 func (cpu *Cpu) Update() {
 	cpu.Pc += 2
 	op1 := cpu.Memory[cpu.Pc]
-	op2 := cpu.Memory[cpu.Pc]
+	op2 := cpu.Memory[cpu.Pc+1]
 	opcode := cpu.uint8ToUint16(op1, op2)
 	cpu.decode(opcode)
 }
