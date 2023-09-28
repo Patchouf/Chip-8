@@ -5,11 +5,12 @@ import (
 	// "./opcodes/opcodes"
 
 	"fmt"
+	"image/color"
 	"io/ioutil"
+	"log"
 	"os"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"main.go/opcodes"
 )
 
@@ -22,11 +23,20 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	ebitenutil.DebugPrint(screen, "Hello, World!")
+	// ebitenutil.DebugPrint(screen,"Hello")
+	for x, row := range g.cpu.Gfx {
+		for y, pixel := range row {
+			if pixel == 1 {
+				screen.Set(x, y, color.White)
+			} else {
+				screen.Set(x, y, color.Black)
+			}
+		}
+	}
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return 640, 320
+	return 64, 32
 }
 
 func main() {
@@ -34,19 +44,18 @@ func main() {
 	rombytes := readROM(filename)
 	// fmt.Println(rombytes)
 	PrintROM(rombytes)
-	
 
 	var game Game
-	
-	opcodes.InitCpu(&game.cpu, rombytes)
-	// fmt.Println(game.cpu.Memory)
 
-	// ebiten.SetWindowSize(640, 320)
-	// ebiten.SetWindowTitle("Chip8 Emulator")
-	// ebiten.RunGame(&Game{})
-	// if err := ebiten.RunGame(&Game{}); err != nil {
-	// 	log.Fatal(err)
-	// }
+	opcodes.InitCpu(&game.cpu, rombytes)
+	fmt.Println(game.cpu.Memory)
+
+	ebiten.SetWindowSize(640, 320)
+	ebiten.SetWindowTitle("Chip8 Emulator")
+	ebiten.RunGame(&Game{})
+	if err := ebiten.RunGame(&Game{}); err != nil {
+		log.Fatal(err)
+	}
 
 }
 

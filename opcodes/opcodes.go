@@ -78,58 +78,61 @@ func (c *Cpu) Uint8ToUint4(n uint8) (uint8, uint8) {
 	return uint8(n >> 4), uint8(n & 0x0F)
 }
 
-// func (c *Cpu) DrawSprite(X, Y, height byte) bool {
-// 	ScreenWidth := uint16(c.Registre[X])
-// 	ScreenHeight := uint16(c.Registre[Y])
+func (c *Cpu) DrawSprite(X, Y, height byte) bool {
+	ScreenWidth := uint16(c.Registre[X])
+	ScreenHeight := uint16(c.Registre[Y])
 
-// 	c.Registre[0xF] = 0
+	c.Registre[0xF] = 0
 
-// 	// Parcourez les lignes du sprite.
-// 	for row := byte(0); row < height; row++ {
-// 		spriteByte := c.Memory[c.I+uint16(row)]
+	// Parcourez les lignes du sprite.
+	for row := byte(0); row < height; row++ {
+		spriteByte := c.Memory[c.I+uint16(row)]
 
-// 		for bit := byte(0); bit < 8; bit++ {
+		for bit := byte(0); bit < 8; bit++ {
 
-// 			if (spriteByte & (0x80 >> bit)) != 0 {
+			if (spriteByte & (0x80 >> bit)) != 0 {
 
-// 				x := int(ScreenWidth) + int(bit)
-// 				y := int(ScreenHeight) + int(row)
+				x := int(ScreenWidth) + int(bit)
+				y := int(ScreenHeight) + int(row)
 
-// 				if x < 64 && y < 32 {
+				if x < 64 && y < 32 {
 
-// 				 	index := y*64 + x
+					index := y*64 + x
 
-// 				 	 if c.Gfx[index] == 1 {
+					if c.Gfx[index][0] == byte(1) {
 
-// 				 	 	c.Registre[0xF] = 1
-// 				 	}
-// 				 	 c.Gfx[index] ^= 1
-// 				 }
-// 			}
-// 		}
-// 	}
-
-//		return c.Registre[0xF] == 1
-//	}
-func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
-	erased := false
-	yIndex := y % 64
-
-	for i := x; i < x+8; i++ {
-		xIndex := i % 32
-
-		wasSet := c.Gfx[xIndex][yIndex] == 1
-		value := row >> (x + 8 - i - 1) & 1
-
-		c.Gfx[xIndex][yIndex] ^= value
-
-		if wasSet && c.Gfx[xIndex][yIndex] == 0 {
-			erased = true
+						c.Registre[0xF] = 1
+					}
+					for i := 0; i < len(c.Gfx[index]); i++ {
+						c.Gfx[index][i] ^= byte(1)
+					}
+				}
+			}
 		}
 	}
 
-	return erased
+	return c.Registre[0xF] == 1
 }
+
+// func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
+// 	erased := false
+// 	yIndex := y % 64
+
+// 	for i := x; i < x+8; i++ {
+// 		xIndex := i % 32
+
+// 		wasSet := c.Gfx[xIndex][yIndex] == 1
+// 		value := row >> (x + 8 - i - 1) & 0x01
+
+// 		c.Gfx[xIndex][yIndex] ^= value
+
+// 		if wasSet && c.Gfx[xIndex][yIndex] == 0 {
+// 			erased = true
+// 		}
+// 	}
+
+// 	return erased
+// }
 
 // Decode décode un opcode et exécute l'instruction correspondante.
 func (c *Cpu) decode(opcode uint16) {
