@@ -32,8 +32,11 @@ func main() {
 	rombytes := readROM(filename)
 	// fmt.Println(rombytes)
 	PrintROM(rombytes)
+	
+	PrintROM(rombytes)
 
 	var game Game
+	
 	opcodes.InitCpu(&game.cpu, rombytes)
 	// fmt.Println(game.cpu.Memory)
 
@@ -43,7 +46,7 @@ func main() {
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
 	}
-
+	
 }
 
 func readROM(filename string) []byte {
