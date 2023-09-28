@@ -19,11 +19,20 @@ type Cpu struct {
 }
 
 type Object struct {
-	clavier [16]byte
+	Clavier [16]byte
 }
 
 func InitCpu(cpu *Cpu, rombytes []byte) {
 	cpu.loadROM(rombytes)
+	cpu.Pc = 0x200 - 2
+}
+
+func (cpu *Cpu) Update() {
+	cpu.Pc += 2
+	op1 := cpu.Memory[cpu.Pc]
+	op2 := cpu.Memory[cpu.Pc]
+	opcode := cpu.uint8ToUint16(op1, op2)
+	cpu.Decode(opcode)
 }
 
 func (cpu *Cpu) loadROM(rombytes []byte) {
@@ -57,6 +66,11 @@ func (c *Cpu) StackPush(address uint16) {
 // Fonction uint16 to uint8
 func (c *Cpu) Uint16ToUint8(n uint16) (uint8, uint8) {
 	return uint8(n >> 8), uint8(n & 0x00FF)
+}
+
+// unit 8 to uint16
+func (c *Cpu) uint8ToUint16(n1 uint8, n2 uint8) uint16 {
+	return uint16(n1)<<8 | uint16(n2)
 }
 
 // Fonction uint8 to uint4
@@ -118,12 +132,12 @@ func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
 }
 
 // Decode décode un opcode et exécute l'instruction correspondante.
-func (c *Cpu) Decode(opcode uint16) {
+func (c *Cpu) decode(opcode uint16) {
 	// Diviser l'opcode en parties individuelles PROBLEME
-	opcodeN := byte(opcode >> 12 & 0x000F) // 4 premiers bits
-	opcodeX := byte(opcode >> 8 & 0x000F)  // Bits 8 à 11
-	opcodeY := byte(opcode >> 4 & 0x000F)  // Bits 4 à 7
-	opcodeNNN := opcode & 0x0FFF           // Bits 0 à 11
+	opcodeN := byte(opcode>>12) & 0x000F // 4 premiers bits
+	opcodeX := byte(opcode>>8) & 0x000F  // Bits 8 à 11
+	opcodeY := byte(opcode>>4) & 0x000F  // Bits 4 à 7
+	opcodeNNN := opcode & 0x0FFF         // Bits 0 à 11
 	// opcodeKK := uint8(opcode & 0x00FF) // Bits 0 à 7
 	opcodeN4 := uint8(opcode & 0x000F) // 4 derniers bits
 	//x := byte(opcodeX & )
