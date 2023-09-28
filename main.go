@@ -1,23 +1,22 @@
 package main
 
 import (
-	"fmt"
-	"io/ioutil"
-	"os"
 
 	// "./opcodes/opcodes"
+
+	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"main.go/opcodes"
 )
 
-type Game struct{
+type Game struct {
 	cpu opcodes.Cpu
 }
 
 func (g *Game) Update() error {
-    return nil
+	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
@@ -29,11 +28,11 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-    ebiten.SetWindowSize(640, 320)
-    ebiten.SetWindowTitle("Chip8 Emulator")
-    ebiten.RunGame(&Game{})
-    if err := ebiten.RunGame(&Game{}); err != nil {
-        log.Fatal(err)
-    }
+	ebiten.SetWindowSize(640, 320)
+	ebiten.SetWindowTitle("Chip8 Emulator")
+	ebiten.RunGame(&Game{})
+	if err := ebiten.RunGame(&Game{}); err != nil {
+		log.Fatal(err)
+	}
 
 }
