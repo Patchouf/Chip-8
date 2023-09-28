@@ -5,13 +5,15 @@ import (
 	"io/ioutil"
 	"os"
 
+	// "./opcodes/opcodes"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"main.go/opcodes"
 )
 
 type Game struct {
-	cpu *opcodes.Cpu
+	cpu opcodes.Cpu
 }
 
 func (g *Game) Update() error {
@@ -27,16 +29,23 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
+	filename := os.Args[1]
+	rombytes := readROM(filename)
+	PrintROM(rombytes)
+
+	var game Game
+	opcodes.InitCpu(&game.cpu, rombytes)
+
+    for i:=0; i < int(game.cpu.Romlength); i++ {
+
+    }
+
 	// ebiten.SetWindowSize(640, 320)
 	// ebiten.SetWindowTitle("Chip8 Emulator")
 	// ebiten.RunGame(&Game{})
 	// if err := ebiten.RunGame(&Game{}); err != nil {
 	// 	log.Fatal(err)
 	// }
-
-	filename := os.Args[1]
-	rombytes := readROM(filename)
-	fmt.Println(rombytes)
 
 }
 
@@ -46,4 +55,16 @@ func readROM(filename string) []byte {
 		panic(err)
 	}
 	return dat
+}
+
+func PrintROM(rom []byte) {
+	for i, byt := range rom {
+		if i%2 == 0 {
+			fmt.Printf("0x%03x: ", 0x200+i)
+		}
+		fmt.Printf("%02x", byt)
+		if i%2 == 1 {
+			fmt.Print("\n")
+		}
+	}
 }
