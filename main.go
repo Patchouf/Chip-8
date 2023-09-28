@@ -13,7 +13,7 @@ import (
 )
 
 type Game struct{
-	cpu *opcodes.Cpu
+	cpu opcodes.Cpu
 }
 
 func (g *Game) Update() error {
