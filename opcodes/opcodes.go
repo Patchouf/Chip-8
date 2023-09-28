@@ -382,6 +382,7 @@ func (c *Cpu) decode(opcode uint16) {
 		// Gérer les opcodes non pris en charge ou inconnus ici
 	}
 }
+
 func (c *Cpu) opDxyn(opcodeX, opcodeY, opcodeN byte) {
 	xval := c.Registre[opcodeX]
 	yval := c.Registre[opcodeY]
