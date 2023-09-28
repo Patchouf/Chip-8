@@ -2,6 +2,7 @@ package opcodes
 
 import (
 	"errors"
+	"fmt"
 	"math/rand"
 )
 
@@ -22,16 +23,123 @@ type Object struct {
 	Clavier [16]byte
 }
 
+func (cpu *Cpu) initialiseFont() {
+	//0x000-0x1FF - Chip 8 interpreter (contains font set in emu)
+	//0x050-0x0A0 - Used for the built in 4x5 pixel font set (0-F)
+	//0 0x050
+	cpu.Memory[0x050] = 0xF0
+	cpu.Memory[0x051] = 0x90
+	cpu.Memory[0x052] = 0x90
+	cpu.Memory[0x053] = 0x90
+	cpu.Memory[0x054] = 0xF0
+	// 1
+	cpu.Memory[0x055] = 0x20
+	cpu.Memory[0x056] = 0x60
+	cpu.Memory[0x057] = 0x20
+	cpu.Memory[0x058] = 0x20
+	cpu.Memory[0x059] = 0x70
+	// 2
+	cpu.Memory[0x05A] = 0xF0
+	cpu.Memory[0x05B] = 0x10
+	cpu.Memory[0x05C] = 0xF0
+	cpu.Memory[0x05D] = 0x80
+	cpu.Memory[0x05E] = 0xF0
+	// 3
+	cpu.Memory[0x05F] = 0xF0
+	cpu.Memory[0x060] = 0x10
+	cpu.Memory[0x061] = 0xF0
+	cpu.Memory[0x062] = 0x10
+	cpu.Memory[0x063] = 0xF0
+	// 4
+	cpu.Memory[0x064] = 0x90
+	cpu.Memory[0x065] = 0x90
+	cpu.Memory[0x066] = 0xF0
+	cpu.Memory[0x067] = 0x10
+	cpu.Memory[0x068] = 0x10
+	// 5
+	cpu.Memory[0x069] = 0xF0
+	cpu.Memory[0x06A] = 0x80
+	cpu.Memory[0x06B] = 0xF0
+	cpu.Memory[0x06C] = 0x10
+	cpu.Memory[0x06D] = 0xF0
+	// 6
+	cpu.Memory[0x06E] = 0xF0
+	cpu.Memory[0x06F] = 0x80
+	cpu.Memory[0x070] = 0xF0
+	cpu.Memory[0x071] = 0x90
+	cpu.Memory[0x072] = 0xF0
+	// 7
+	cpu.Memory[0x073] = 0xF0
+	cpu.Memory[0x074] = 0x10
+	cpu.Memory[0x075] = 0x20
+	cpu.Memory[0x076] = 0x40
+	cpu.Memory[0x077] = 0x40
+	// 8
+	cpu.Memory[0x078] = 0xF0
+	cpu.Memory[0x079] = 0x90
+	cpu.Memory[0x07A] = 0xF0
+	cpu.Memory[0x07B] = 0x90
+	cpu.Memory[0x07C] = 0xF0
+	// 9
+	cpu.Memory[0x07D] = 0xF0
+	cpu.Memory[0x07E] = 0x90
+	cpu.Memory[0x07F] = 0xF0
+	cpu.Memory[0x080] = 0x10
+	cpu.Memory[0x081] = 0xF0
+	// A
+	cpu.Memory[0x082] = 0xF0
+	cpu.Memory[0x083] = 0x90
+	cpu.Memory[0x084] = 0xF0
+	cpu.Memory[0x085] = 0x90
+	cpu.Memory[0x086] = 0x90
+	// B
+	cpu.Memory[0x087] = 0xE0
+	cpu.Memory[0x088] = 0x90
+	cpu.Memory[0x089] = 0xE0
+	cpu.Memory[0x08A] = 0x90
+	cpu.Memory[0x08B] = 0xE0
+	// C
+	cpu.Memory[0x08C] = 0xF0
+	cpu.Memory[0x08D] = 0x80
+	cpu.Memory[0x08E] = 0x80
+	cpu.Memory[0x08F] = 0x80
+	cpu.Memory[0x090] = 0xF0
+	// D
+	cpu.Memory[0x091] = 0xE0
+	cpu.Memory[0x092] = 0x90
+	cpu.Memory[0x093] = 0x90
+	cpu.Memory[0x094] = 0x90
+	cpu.Memory[0x095] = 0xE0
+	// E
+	cpu.Memory[0x096] = 0xF0
+	cpu.Memory[0x097] = 0x80
+	cpu.Memory[0x098] = 0xF0
+	cpu.Memory[0x099] = 0x80
+	cpu.Memory[0x09A] = 0xF0
+	// F
+	cpu.Memory[0x09B] = 0xF0
+	cpu.Memory[0x09C] = 0x80
+	cpu.Memory[0x09D] = 0xF0
+	cpu.Memory[0x09E] = 0x80
+	cpu.Memory[0x09F] = 0x80
+}
+
 func InitCpu(cpu *Cpu, rombytes []byte) {
+	cpu.initialiseFont()
 	cpu.loadROM(rombytes)
 	cpu.Pc = 0x200 - 2
+	// fmt.Println(cpu.Pc)
+
 }
 
 func (cpu *Cpu) Update() {
 	cpu.Pc += 2
 	op1 := cpu.Memory[cpu.Pc]
 	op2 := cpu.Memory[cpu.Pc+1]
+	// fmt.Println(op1, " ", op2)
 	opcode := cpu.uint8ToUint16(op1, op2)
+	fmt.Printf("%02x", opcode)
+	fmt.Println()
 	cpu.decode(opcode)
 }
 
@@ -70,7 +178,7 @@ func (c *Cpu) Uint16ToUint8(n uint16) (uint8, uint8) {
 
 // unit 8 to uint16
 func (c *Cpu) uint8ToUint16(n1 uint8, n2 uint8) uint16 {
-	return uint16(n1)<<8 | uint16(n2)
+	return uint16(uint16(n1)<<8 | uint16(n2))
 }
 
 // Fonction uint8 to uint4
@@ -78,58 +186,60 @@ func (c *Cpu) Uint8ToUint4(n uint8) (uint8, uint8) {
 	return uint8(n >> 4), uint8(n & 0x0F)
 }
 
-// func (c *Cpu) DrawSprite(X, Y, height byte) bool {
-// 	ScreenWidth := uint16(c.Registre[X])
-// 	ScreenHeight := uint16(c.Registre[Y])
+func (c *Cpu) DrawSprite(X, Y, height byte) bool {
+	ScreenWidth := uint16(c.Registre[X])
+	ScreenHeight := uint16(c.Registre[Y])
 
-// 	c.Registre[0xF] = 0
+	c.Registre[0xF] = 0
 
-// 	// Parcourez les lignes du sprite.
-// 	for row := byte(0); row < height; row++ {
-// 		spriteByte := c.Memory[c.I+uint16(row)]
+	// Parcourez les lignes du sprite.
+	for row := byte(0); row < height; row++ {
+		spriteByte := c.Memory[c.I+uint16(row)]
 
-// 		for bit := byte(0); bit < 8; bit++ {
+		for bit := byte(0); bit < 8; bit++ {
 
-// 			if (spriteByte & (0x80 >> bit)) != 0 {
+			if (spriteByte & (0x80 >> bit)) != 0 {
 
-// 				x := int(ScreenWidth) + int(bit)
-// 				y := int(ScreenHeight) + int(row)
+				x := int(ScreenWidth) + int(bit)
+				y := int(ScreenHeight) + int(row)
 
-// 				if x < 64 && y < 32 {
+				if x < 64 && y < 32 {
 
-// 				 	index := y*64 + x
+					index := y*64 + x
 
-// 				 	 if c.Gfx[index] == 1 {
+					if c.Gfx[index][0] == byte(1) {
 
-// 				 	 	c.Registre[0xF] = 1
-// 				 	}
-// 				 	 c.Gfx[index] ^= 1
-// 				 }
-// 			}
+						c.Registre[0xF] = 1
+					}
+					for i := 0; i < len(c.Gfx[index]); i++ {
+						c.Gfx[index][i] ^= byte(1)
+					}
+				}
+			}
+		}
+	}
+	return c.Registre[0xF] == 1
+}
+
+// func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
+// 	erased := false
+// 	yIndex := y % 64
+
+// 	for i := x; i < x+8; i++ {
+// 		xIndex := i % 32
+
+// 		wasSet := c.Gfx[xIndex][yIndex] == 1
+// 		value := row >> (x + 8 - i - 1) & 0x01
+
+// 		c.Gfx[xIndex][yIndex] ^= value
+
+// 		if wasSet && c.Gfx[xIndex][yIndex] == 0 {
+// 			erased = true
 // 		}
 // 	}
 
-//		return c.Registre[0xF] == 1
-//	}
-func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
-	erased := false
-	yIndex := y % 64
-
-	for i := x; i < x+8; i++ {
-		xIndex := i % 32
-
-		wasSet := c.Gfx[xIndex][yIndex] == 1
-		value := row >> (x + 8 - i - 1) & 1
-
-		c.Gfx[xIndex][yIndex] ^= value
-
-		if wasSet && c.Gfx[xIndex][yIndex] == 0 {
-			erased = true
-		}
-	}
-
-	return erased
-}
+// 	return erased
+// }
 
 // Decode décode un opcode et exécute l'instruction correspondante.
 func (c *Cpu) decode(opcode uint16) {
@@ -157,7 +267,7 @@ func (c *Cpu) decode(opcode uint16) {
 		}
 	case 0x1:
 		// Opcode 1NNN - Saut
-		c.op1nnn(uint16(opcodeN))
+		c.op1nnn(uint16(opcodeNNN)) // PTET ERREUR = opcodeN a la place
 	case 0x2:
 		// Opcode 2NNN - Appel de sous-routine
 		c.StackPush(c.Pc)
@@ -219,6 +329,7 @@ func (c *Cpu) decode(opcode uint16) {
 			c.Pc += 2
 		}
 	case 0xA:
+		c.opAnnn(uint16(opcodeNNN)) // PTET ERREUR  PTET ERREUR = opcodeN a la place
 		// Opcode ANNN - Chargement de l'index (I)
 		// c.I = opcodeNNN
 	case 0xB:
@@ -297,4 +408,8 @@ func (c *Cpu) op6XNN(opcodeX, opcodeNNN byte) {
 }
 func (c *Cpu) op1nnn(address uint16) {
 	c.Pc = address
+}
+
+func (c *Cpu) opAnnn(address uint16) {
+	c.I = address
 }
