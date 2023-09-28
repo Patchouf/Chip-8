@@ -32,7 +32,7 @@ func (cpu *Cpu) Update() {
 	op1 := cpu.Memory[cpu.Pc]
 	op2 := cpu.Memory[cpu.Pc]
 	opcode := cpu.uint8ToUint16(op1, op2)
-	cpu.decode(opcode)
+	cpu.Decode(opcode)
 }
 
 func (cpu *Cpu) loadROM(rombytes []byte) {
@@ -63,10 +63,6 @@ func (c *Cpu) stackPush(address uint16) {
 	c.Sp++
 }
 
-// Fonction uint8 to uint16
-func (c *Cpu) uint8ToUint16(n uint8, m uint8) uint16 {
-	return uint16(n) << 8 | uint16(m & 0x00FF)
-}
 
 // Fonction uint16 to uint8
 func (c *Cpu) uint16ToUint8(n uint16) (uint8, uint8) {
@@ -125,7 +121,7 @@ func (c *Cpu) drawSprite(VX, VY, height byte) bool {
 }
 
 // Decode décode un opcode et exécute l'instruction correspondante.
-func (c *Cpu) decode(opcode uint16) {
+func (c *Cpu) Decode(opcode uint16) {
 	// Diviser l'opcode en parties individuelles
 	opcodeN := (opcode >> 12) & 0x000F // 4 premiers bits
 	// opcodeX := (opcode >> 8) & 0x000F   // Bits 8 à 11

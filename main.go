@@ -33,9 +33,11 @@ func main() {
 	filename := os.Args[1]
 	rombytes := readROM(filename)
 	// fmt.Println(rombytes)
-	// PrintROM(rombytes)
+	PrintROM(rombytes)
+	
 
 	var game Game
+	
 	opcodes.InitCpu(&game.cpu, rombytes)
 	// fmt.Println(game.cpu.Memory)
 
