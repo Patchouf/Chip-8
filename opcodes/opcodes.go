@@ -160,7 +160,7 @@ func (c *Cpu) decode(opcode uint16) {
 		}
 	case 0x1:
 		// Opcode 1NNN - Saut
-		c.op1nnn(uint16(opcodeN))
+		c.op1nnn(uint16(opcodeNNN)) // PTET ERREUR = opcodeN a la place
 	case 0x2:
 		// Opcode 2NNN - Appel de sous-routine
 		c.StackPush(c.Pc)
@@ -222,6 +222,7 @@ func (c *Cpu) decode(opcode uint16) {
 			c.Pc += 2
 		}
 	case 0xA:
+		c.opAnnn(uint16(opcodeNNN)) // PTET ERREUR  PTET ERREUR = opcodeN a la place
 		// Opcode ANNN - Chargement de l'index (I)
 		// c.I = opcodeNNN
 	case 0xB:
@@ -300,4 +301,8 @@ func (c *Cpu) op6XNN(opcodeX, opcodeNNN byte) {
 }
 func (c *Cpu) op1nnn(address uint16) {
 	c.Pc = address
+}
+
+func (c *Cpu) opAnnn(address uint16) {
+	c.I = address
 }
