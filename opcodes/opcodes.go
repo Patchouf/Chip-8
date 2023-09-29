@@ -139,7 +139,8 @@ func (cpu *Cpu) Update() {
 	// fmt.Println(op1, " ", op2)
 	opcode := cpu.uint8ToUint16(op1, op2)
 	fmt.Printf("%02x", opcode)
-	fmt.Println()
+	fmt.Print(":      ")
+	// fmt.Println()
 	cpu.decode(opcode)
 }
 
@@ -249,7 +250,17 @@ func (c *Cpu) decode(opcode uint16) {
 	opcodeY := byte(opcode>>4) & 0x000F  // Bits 4 à 7
 	opcodeNNN := opcode & 0x0FFF         // Bits 0 à 11
 	// opcodeKK := uint8(opcode & 0x00FF) // Bits 0 à 7
-	opcodeN4 := uint8(opcode & 0x000F) // 4 derniers bits
+	opcodeN4 := uint8(opcode & 0x000F) // 4 derniers bitso 
+	fmt.Printf("%02x", opcodeN)
+	fmt.Print(" ")
+	fmt.Printf("%02x", opcodeX)
+	fmt.Print(" ")
+	fmt.Printf("%02x", opcodeY)
+	fmt.Print(" ")
+	fmt.Printf("%02x", opcodeN4)
+	fmt.Print(" ")
+	fmt.Printf("%02x", opcodeNNN)
+	fmt.Println()
 	//x := byte(opcodeX & )
 
 	// Utilisez un switch pour gérer chaque opcode
@@ -267,7 +278,7 @@ func (c *Cpu) decode(opcode uint16) {
 		}
 	case 0x1:
 		// Opcode 1NNN - Saut
-		c.op1nnn(uint16(opcodeNNN)) // PTET ERREUR = opcodeN a la place
+		c.op1nnn(uint16(opcodeN)) // PTET ERREUR = opcodeN a la place
 	case 0x2:
 		// Opcode 2NNN - Appel de sous-routine
 		c.StackPush(c.Pc)
@@ -380,6 +391,7 @@ func (c *Cpu) decode(opcode uint16) {
 		}
 	default:
 		// Gérer les opcodes non pris en charge ou inconnus ici
+
 	}
 }
 
