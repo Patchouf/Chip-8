@@ -53,7 +53,7 @@ func main() {
 	// fmt.Println(game.cpu.Memory)
 
 	ebiten.SetWindowSize(640, 320)
-	ebiten.SetWindowTitle("Chip8 Emulator : " + filename[6:][:12])
+	ebiten.SetWindowTitle("Chip8 Emulator :  " + filename[6:])
 	ebiten.RunGame(&game)
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)

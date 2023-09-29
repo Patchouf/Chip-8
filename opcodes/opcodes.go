@@ -210,8 +210,8 @@ func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
 	yIndex := y % 32
 
 	for i := x; i < x+8; i++ {
-		
 		xIndex := i % 64
+
 		wasSet := c.Gfx[xIndex][yIndex] == 1
 		value := row >> (x + 8 - i - 1) & 0x01
 		c.Gfx[xIndex][yIndex] ^= value
@@ -240,25 +240,32 @@ func (c *Cpu) decode(opcode uint16) {
 	case 0x0000:
 		switch opcode {
 		case 0x00E0:
+
 			// Opcode 00E0 - Effacer l'écran =
 			// Clear the display.
+
 			c.op00E0()
 
 		case 0x00EE:
+
 			// Opcode 00EE - Retour de sous-routine =
 			// Return from a subroutine.The interpreter sets the program counter to the address at the top of the stack,
 			// then subtracts 1 from the stack pointer
+
 			c.op00EE()
 
 		default:
 			// Gérer les opcodes 0NNN ici (non standard)
 		}
 	case 0x1000:
+
 		// Opcode 1NNN - Saut =
 		// Jump to location nnn. The interpreter sets the program counter to nnn.
+
 		c.op1nnn(uint16(opcodeNNN)) // PTET ERREUR = opcodeN a la place
 
 	case 0x2000:
+
 		// Opcode 2NNN - Appel de sous-routine =
 		// Call subroutine at nnn. The interpreter increments the stack pointer, then puts the current PC on the top
 		//of the stack. The PC is then set to nnn.
@@ -266,29 +273,38 @@ func (c *Cpu) decode(opcode uint16) {
 		c.op2nnn(opcode & 0x0FFF)
 
 	case 0x3:
+
 		// Opcode 3XNN - Saut conditionnel (égal) =
 		// Skip next instruction if Vx = kk. The interpreter compares register Vx to kk, and if they are equal,
 		//increments the program counter by 2.
+
 		c.op3nnn(opcodeX, opcodeNN)
 
 	case 0x4000:
+
 		// Opcode 4XNN - Saut conditionnel (différent)
 		// Skip next instruction if Vx != kk. The interpreter compares register Vx to kk, and if they are not equal,
 		// increments the program counter by 2.
+
 		c.op4nnn(opcodeX, opcodeNN)
 
 	case 0x5000:
+
 		// Opcode 5XY0 - Saut conditionnel (égalité de registres)
 		// Skip next instruction if Vx = Vy. The interpreter compares register Vx to register Vy, and if they are equal,
 		// increments the program counter by 2.
+
 		c.op5nnn(opcodeX, opcodeY)
 
 	case 0x6000:
+
 		// Opcode 6XNN - Chargement de valeur constante
 		// Set Vx = kk. The interpreter puts the value kk into register Vx
+
 		c.op6nnn(opcodeX, opcodeNN)
 
 	case 0x7000:
+
 		// Opcode 7XNN - Ajout de valeur constante =
 		// Set Vx = Vx + kk. Adds the value kk to the value of register Vx, then stores the result in Vx.
 
@@ -299,11 +315,14 @@ func (c *Cpu) decode(opcode uint16) {
 		switch opcode & 0x000F {
 
 		case 0x0000:
+
 			// Opcode 8XY0 - Copie de Registre =
 			//Set Vx = Vy. Stores the value of register Vy in register Vx.
+
 			c.op8nn0(opcodeX, opcodeY)
 
 		case 0x0001:
+
 			// Opcode 8XY1 - Opération OU (bitwise OR) =
 			//Set Vx = Vx OR Vy. Performs a bitwise OR on the values of Vx and Vy, then stores the result in Vx. A
 			//bit wise OR compares the corresponding bits from two values, and if either bit is 1, then the same bit in the
@@ -312,6 +331,7 @@ func (c *Cpu) decode(opcode uint16) {
 			c.op8nn1(opcodeX, opcodeY)
 
 		case 0x0002:
+
 			// Opcode 8XY2 - Opération ET (bitwise AND) =
 			//Set Vx = Vx AND Vy. Performs a bitwise AND on the values of Vx and Vy, then stores the result in Vx.
 			//A bitwise AND compares the corresponding bits from two values, and if both bits are 1, then the same bit
@@ -329,6 +349,7 @@ func (c *Cpu) decode(opcode uint16) {
 			c.op8nn3(opcodeX, opcodeY)
 
 		case 0x0004:
+
 			// Opcode 8XY4 - Ajout avec retenue =
 			//Set Vx = Vx + Vy, set VF = carry. The values of Vx and Vy are added together. If the result is greater
 			//than 8 bits (i.e., ¿ 255,) VF is set to 1, otherwise 0. Only the lowest 8 bits of the result are kept, and stored
@@ -348,6 +369,7 @@ func (c *Cpu) decode(opcode uint16) {
 			c.op8nn5(opcodeX, opcodeY)
 
 		case 0x0006:
+
 			// Opcode 8XY6 - Décalage à droite
 			//Set Vx = Vx SHR 1. If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is
 			//divided 	by 2
@@ -355,31 +377,54 @@ func (c *Cpu) decode(opcode uint16) {
 			c.op8nn6(opcodeX, opcodeY)
 
 		case 0x0007:
+
 			// Opcode 8XY7 - Soustraction inversée avec retenue =
 			//Set Vx = Vy - Vx, set VF = NOT borrow. If Vy ¿ Vx, then VF is set to 1, otherwise 0. Then Vx is
 			//subtracted from Vy, and the results stored in Vx.
+
+			c.op8nn7(opcodeX, opcodeY)
+
 		case 0xE:
-			// Opcode 8XYE - Décalage à gauche
-			c.Registre[opcodeN4] <<= 1
+
+			// Opcode 8XYE - Décalage à gauche =
+			//Set Vx = Vx SHL 1. If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is
+			//multiplied by 2
+
+			c.op8nnE(opcodeX, opcodeY)
+
 		default:
 			// Gérer les opcodes 8XY0 à 8XYE ici (non standard)
 		}
 	case 0x9000:
-		// Opcode 9XY0 - Saut conditionnel (différents registres)
-		if c.Registre[opcodeX] != c.Registre[opcodeY] {
-			c.Pc += 2
-		}
+
+		// Opcode 9XY0 - Saut conditionnel (différents registres)=
+		//Skip next instruction if Vx != Vy. The values of Vx and Vy are compared, and if they are not equal, the
+		//program counter is increased by 2
+
+		c.op9nn0(opcodeX, opcodeY)
+
 	case 0xA000:
+
+		// Opcode ANNN - Chargement de l'index (I) =
+		// Set I = nnn. The value of register I is set to nnn.
+
 		c.opAnnn(uint16(opcodeNNN)) // PTET ERREUR  PTET ERREUR = opcodeN a la place
-		// Opcode ANNN - Chargement de l'index (I)
-		c.I = opcodeNNN
+
 	case 0xB000:
-		// Opcode BNNN - Saut avec offset
-		c.Pc = opcodeNNN + uint16(c.Registre[0])
-		c.Pc = opcodeNNN + uint16(c.Registre[0])
+
+		// Opcode BNNN - Saut avec offset =
+		//Jump to location nnn + V0. The program counter is set to nnn plus the value of V0
+
+		c.opBnnn(uint16(opcodeNNN))
+
 	case 0xC000:
-		// Opcode CXNN - Génération d'un nombre aléatoire (0 à 255)
+
+		// Opcode CXNN - Génération d'un nombre aléatoire (0 à 255) =
+		//Set Vx = random byte AND kk. The interpreter generates a random number from 0 to 255, which is then
+		//ANDed with the value kk. The results are stored in Vx. See instruction 8xy2 for more information on AND.
+
 		c.Registre[opcodeN4] = byte(rand.Int()*256) & byte(opcodeNNN)
+
 	case 0xD000:
 		// Opcode DXYN - Dessin à l'écran
 		c.opDxyn(opcodeX, opcodeY, opcodeN)
@@ -465,11 +510,6 @@ func (c *Cpu) op00EE() {
 	c.Sp--
 }
 
-// remet l'index à la valeur nnn
-func (c *Cpu) opAnnn(address uint16) {
-	c.I = address
-}
-
 func (c *Cpu) op1nnn(address uint16) {
 	c.Pc = address - 2
 }
@@ -547,18 +587,58 @@ func (c *Cpu) op8nn5(opcodeX, opcodeY byte) {
 
 	if c.Registre[opcodeX] > c.Registre[opcodeY] {
 		c.Registre[0xF] = 1
+	} else {
+		c.Registre[0xF] = 0
 	}
-	c.Registre[0xF] = 1
+
 	c.Registre[opcodeX] -= c.Registre[opcodeY]
 }
 
-func (c *Cpu) op8nn6(opcodeX, opcodeY byte) { // ????????????
+func (c *Cpu) op8nn6(opcodeX, opcodeY byte) {
+
 	if c.Registre[opcodeX]&0xF == 1 {
 		c.Registre[0xF] = 1
 	} else {
 		c.Registre[0xF] = 0
-	}	
+	}
+
 	c.Registre[opcodeX] /= 2
 }
 
+func (c *Cpu) op8nn7(opcodeX, opcodeY byte) {
 
+	if c.Registre[opcodeY] > c.Registre[opcodeX] {
+		c.Registre[0xF] = 1
+	} else {
+		c.Registre[0xF] = 0
+	}
+	c.Registre[opcodeX] = c.Registre[opcodeY] - c.Registre[opcodeX]
+}
+
+func (c *Cpu) op8nnE(opcodeX, opcodeY byte) {
+	if c.Registre[opcodeX]&0x000F == 1 {
+		c.Registre[0xF] = 1
+	} else {
+		c.Registre[0xF] = 0
+	}
+	c.Registre[opcodeX] *= 2
+}
+
+func (c *Cpu) op9nn0(opcodeX, opcodeY byte) {
+	if c.Registre[opcodeX] != c.Registre[opcodeY] {
+		c.Pc += 2
+	}
+}
+
+func (c *Cpu) opAnnn(address uint16) { // verifier si nnn = opcodennn ou 0
+	c.I = address
+}
+
+func (c *Cpu) opBnnn(address uint16) {
+	c.Pc = address + uint16(c.Registre[0])
+}
+
+func (c *Cpu) opCxkk(opcodeX, opcodeNN byte) {
+
+	c.Registre[opcodeX] = byte(rand.Int()*256) & opcodeNN
+}
