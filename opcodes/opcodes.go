@@ -123,6 +123,7 @@ func (cpu *Cpu) initialiseFont() {
 	cpu.Memory[0x09F] = 0x80
 }
 
+// Initialisation du cpu
 func InitCpu(cpu *Cpu, rombytes []byte) {
 	cpu.initialiseFont()
 	cpu.loadROM(rombytes)
@@ -131,6 +132,7 @@ func InitCpu(cpu *Cpu, rombytes []byte) {
 
 }
 
+// Update du cpu
 func (cpu *Cpu) Update() {
 	cpu.Pc += 2
 	op1 := cpu.Memory[cpu.Pc]
@@ -142,6 +144,7 @@ func (cpu *Cpu) Update() {
 	cpu.decode(opcode)
 }
 
+// chargement du rom
 func (cpu *Cpu) loadROM(rombytes []byte) {
 	cpu.Romlength = uint16(len(rombytes))
 	for i, byt := range rombytes {
@@ -201,6 +204,7 @@ func (c *Cpu) Uint8ToUint4(n uint8) (uint8, uint8) {
 // 	return c.Registre[0xF] == 1
 // }
 
+// DrawSprite dessine un sprite à l'écran et renvoie true si un pixel a été effacé
 func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
 	erased := false
 	yIndex := y % 64
@@ -221,15 +225,15 @@ func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
 	return erased
 }
 
-// Decode décode un opcode et exécute l'instruction correspondante.
+// décodage d'un opcode et exécute l'instruction correspondante.
 func (c *Cpu) decode(opcode uint16) {
 	// Diviser l'opcode en parties individuelles PROBLEME
 	opcodeN := byte(opcode>>12) & 0x000F // 4 premiers bits
 	opcodeX := byte(opcode>>8) & 0x000F  // Bits 8 à 11
 	opcodeY := byte(opcode>>4) & 0x000F  // Bits 4 à 7
 	opcodeNNN := opcode & 0x0FFF         // Bits 0 à 11
-	// opcodeKK := uint8(opcode & 0x00FF) // Bits 0 à 7
-	opcodeN4 := uint8(opcode & 0x000F) // 4 derniers bits
+	opcodeNN := byte(opcode & 0x00FF) // Bits 0 à 7
+	opcodeN4 := byte(opcode & 0x000F) // 4 derniers bits
 	//x := byte(opcodeX & )
 
 	// Utilisez un switch pour gérer chaque opcode
@@ -268,45 +272,51 @@ func (c *Cpu) decode(opcode uint16) {
 		}
 	case 0x4:
 		// Opcode 4XNN - Saut conditionnel (différent)
-		if c.Registre[opcodeN4] != byte(opcodeNNN) {
+		if c.Registre[opcodeX] != byte(opcodeNN) {
 			c.Pc += 2
 		}
 	case 0x5:
 		// Opcode 5XY0 - Saut conditionnel (égalité de registres)
-		if c.Registre[opcodeN4] == c.Registre[opcodeN4] {
+		if c.Registre[opcodeX] == c.Registre[opcodeY] {
 			c.Pc += 2
 		}
 	case 0x6:
 		// Opcode 6XNN - Chargement de valeur constante
-		c.op6XNN(opcodeX, opcodeN)
+		c.op6XNN(opcodeX, opcodeNN)
 		// c.Registre[opcodeN4] = byte(opcodeNNN)
 	case 0x7:
 		// Opcode 7XNN - Ajout de valeur constante
-		c.Registre[opcodeN4] += byte(opcodeNNN)
+		c.Registre[opcodeX] += byte(opcodeNN)
 	case 0x8:
 		// Gérer les opcodes 8XY0 à 8XYE
 		switch opcodeN4 {
 		case 0x0:
 			// Opcode 8XY0 - Copie de Registre
-			c.Registre[opcodeN4] = c.Registre[opcodeN4]
+			c.Registre[opcodeX] = c.Registre[opcodeY]
 		case 0x1:
 			// Opcode 8XY1 - Opération OU (bitwise OR)
-			c.Registre[opcodeN4] |= byte(opcodeNNN)
+			c.Registre[opcodeX] |= byte(opcodeY)
 		case 0x2:
 			// Opcode 8XY2 - Opération ET (bitwise AND)
-			c.Registre[opcodeN4] &= byte(opcodeNNN)
+			c.Registre[opcodeX] &= byte(opcodeY)
 		case 0x3:
 			// Opcode 8XY3 - Opération XOR (bitwise XOR)
-			c.Registre[opcodeN4] ^= byte(opcodeNNN)
+			c.Registre[opcodeX] ^= byte(opcodeY)
 		case 0x4:
 			// Opcode 8XY4 - Ajout avec retenue
+			//  Vx += Vy
+			c.Registre[opcodeX] += c.Registre[opcodeY]
 		case 0x5:
 			// Opcode 8XY5 - Soustraction avec retenue
+			// Vx -= Vy
+			c.Registre[opcodeX] -= c.Registre[opcodeY]
 		case 0x6:
 			// Opcode 8XY6 - Décalage à droite
-			c.Registre[opcodeN4] >>= 1
+			c.Registre[0xF] = c.Registre[opcodeY] & 0x1
+			c.Registre[opcodeY] >>= 1
 		case 0x7:
 			// Opcode 8XY7 - Soustraction inversée avec retenue
+			c.Registre[0xF] = c.Registre[opcodeX] & 0x1
 		case 0xE:
 			// Opcode 8XYE - Décalage à gauche
 			c.Registre[opcodeN4] <<= 1
@@ -315,16 +325,17 @@ func (c *Cpu) decode(opcode uint16) {
 		}
 	case 0x9:
 		// Opcode 9XY0 - Saut conditionnel (différents registres)
-		if c.Registre[opcodeN4] != c.Registre[opcodeN4] {
+		if c.Registre[opcodeX] != c.Registre[opcodeY] {
 			c.Pc += 2
 		}
 	case 0xA:
 		c.opAnnn(uint16(opcodeNNN)) // PTET ERREUR  PTET ERREUR = opcodeN a la place
 		// Opcode ANNN - Chargement de l'index (I)
-		// c.I = opcodeNNN
+		c.I = opcodeNNN
 	case 0xB:
 		// Opcode BNNN - Saut avec offset
-		// c.Pc = opcodeNNN + uint16(c.Registre[0])
+		c.Pc = opcodeNNN + uint16(c.Registre[0])
+		c.Pc = opcodeNNN + uint16(c.Registre[0])
 	case 0xC:
 		// Opcode CXNN - Génération d'un nombre aléatoire (0 à 255)
 		c.Registre[opcodeN4] = byte(rand.Int()*256) & byte(opcodeNNN)
@@ -332,8 +343,7 @@ func (c *Cpu) decode(opcode uint16) {
 		// Opcode DXYN - Dessin à l'écran
 		c.opDxyn(opcodeX, opcodeY, opcodeN)
 		// Gérer l'opcode DXYN ici
-		c.DrawSprite(opcodeN4, opcodeN4, opcodeN4)
-		break
+		// c.DrawSprite(opcodeN4, opcodeN4, opcodeN4)
 
 	case 0xE:
 		// Gérer les opcodes EX9E et EXA1
@@ -349,6 +359,7 @@ func (c *Cpu) decode(opcode uint16) {
 		switch opcodeNNN {
 		case 0x07:
 			// Opcode FX07 - Chargement du retard
+			c.Delay_timer = c.Registre[opcodeX]
 		case 0x0A:
 			// Opcode FX0A - Attente de touche
 		case 0x15:
@@ -359,6 +370,7 @@ func (c *Cpu) decode(opcode uint16) {
 			// Opcode FX1E - Ajout de l'index (I)
 		case 0x29:
 			// Opcode FX29 - Chargement de l'emplacement du caractère
+
 		case 0x33:
 			// Opcode FX33 - Chargement des chiffres décimaux
 		case 0x55:
@@ -373,6 +385,7 @@ func (c *Cpu) decode(opcode uint16) {
 	}
 }
 
+// dessine les pixels
 func (c *Cpu) opDxyn(opcodeX, opcodeY, opcodeN byte) {
 	xval := c.Registre[opcodeX]
 	yval := c.Registre[opcodeY]
@@ -405,6 +418,7 @@ func (c *Cpu) op00EE() {
 	c.Sp--
 }
 
+// remet l'index à la valeur nnn
 func (c *Cpu) opAnnn(address uint16) {
 	c.I = address
 }
