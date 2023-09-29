@@ -15,12 +15,14 @@ type Game struct {
 	cpu opcodes.Cpu
 }
 
+// update du jeu
 func (g *Game) Update() error {
 	g.cpu.Update()
 	time.Sleep(time.Millisecond)
 	return nil
 }
 
+// dessin des pixels du jeu
 func (g *Game) Draw(screen *ebiten.Image) {
 	// ebitenutil.DebugPrint(screen,"Hello")
 	for x, row := range g.cpu.Gfx {
@@ -34,10 +36,12 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	}
 }
 
+// fonction pour set l'écran
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return 64, 32
 }
 
+// fonction pour start la game, ouverture du screen
 func main() {
 	filename := os.Args[1]
 	rombytes := readROM(filename)
@@ -46,7 +50,7 @@ func main() {
 
 	var game Game
 	opcodes.InitCpu(&game.cpu, rombytes)
-	fmt.Println(game.cpu.Memory)
+	// fmt.Println(game.cpu.Memory)
 
 	ebiten.SetWindowSize(640, 320)
 	ebiten.SetWindowTitle("Chip8 Emulator")
@@ -57,6 +61,7 @@ func main() {
 
 }
 
+// fonction pour lire le fichier rom
 func readROM(filename string) []byte {
 	dat, err := os.ReadFile(filename)
 	if err != nil {
@@ -65,6 +70,7 @@ func readROM(filename string) []byte {
 	return dat
 }
 
+// fonction pour print le rom
 func PrintROM(rom []byte) {
 	for i, byt := range rom {
 		if i%2 == 0 {
