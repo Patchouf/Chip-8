@@ -230,7 +230,7 @@ func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
 // décodage d'un opcode et exécute l'instruction correspondante.
 func (c *Cpu) decode(opcode uint16) {
 	// Diviser l'opcode en parties individuelles PROBLEME
-	opcodeN := byte(opcode>>12) & 0x000F // 4 premiers bits
+	// opcodeN := byte(opcode>>12) & 0x000F // 4 premiers bits
 	opcodeX := byte(opcode>>8) & 0x000F  // Bits 8 à 11
 	opcodeY := byte(opcode>>4) & 0x000F  // Bits 4 à 7
 	opcodeNNN := opcode & 0x0FFF         // Bits 0 à 11
@@ -243,26 +243,15 @@ func (c *Cpu) decode(opcode uint16) {
 	case 0x0000:
 		switch opcode {
 		case 0x00E0:
-
-			// Opcode 00E0 - Effacer l'écran =
-			// Clear the display.
-
 			c.op00E0()
-
 		case 0x00EE:
-
-			// Opcode 00EE - Retour de sous-routine =
-			// Return from a subroutine.The interpreter sets the program counter to the address at the top of the stack,
-			// then subtracts 1 from the stack pointer
-
 			c.op00EE()
-
 		default:
 			// Gérer les opcodes 0NNN ici (non standard)
 		}
 	case 0x1000:
 
-		// Opcode 1NNN - Saut =
+		// Opcode 1NNN - Saut
 		// Jump to location nnn. The interpreter sets the program counter to nnn.
 
 		c.op1nnn(uint16(opcodeNNN)) // PTET ERREUR = opcodeN a la place
@@ -325,11 +314,6 @@ func (c *Cpu) decode(opcode uint16) {
 			c.op8nn0(opcodeX, opcodeY)
 
 		case 0x0001:
-
-			// Opcode 8XY1 - Opération OU (bitwise OR) =
-			//Set Vx = Vx OR Vy. Performs a bitwise OR on the values of Vx and Vy, then stores the result in Vx. A
-			//bit wise OR compares the corresponding bits from two values, and if either bit is 1, then the same bit in the
-			// result is also 1. Otherwise, it is 0.
 
 			c.op8nn1(opcodeX, opcodeY)
 
@@ -429,8 +413,8 @@ func (c *Cpu) decode(opcode uint16) {
 		c.opCxkk(opcodeX, opcodeNN)
 
 	case 0xD000:
-
-		// Opcode DXYN - Dessin à l'écran =
+		// Opcode DXYN - Dessin à l'écran
+		c.opDxyn(opcodeX, opcodeY, opcodeN4)
 		// Gérer l'opcode DXYN ici
 		//Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision. The interpreter reads n
 		//bytes from memory, starting at the address stored in I. These bytes are then displayed as sprites on screen
@@ -490,7 +474,6 @@ func (c *Cpu) decode(opcode uint16) {
 			// Opcode FX1E - Ajout de l'index (I)
 		case 0x0009:
 			// Opcode FX29 - Chargement de l'emplacement du caractère
-
 		case 0x0003:
 			// Opcode FX33 - Chargement des chiffres décimaux
 
@@ -504,6 +487,8 @@ func (c *Cpu) decode(opcode uint16) {
 
 // dessine les pixels
 
+// Opcode 00E0 - Effacer l'écran =
+// Clear the display.
 func (c *Cpu) op00E0() {
 	for x := 0; x < 64; x++ {
 		for y := 0; y < 32; y++ {
@@ -516,6 +501,10 @@ func (c *Cpu) op00E0() {
 func (c *Cpu) op6XNN(opcodeX, opcodeNNN byte) {
 	c.Registre[opcodeX] = opcodeNNN
 }
+
+// Opcode 00EE - Retour de sous-routine =
+// Return from a subroutine.The interpreter sets the program counter to the address at the top of the stack,
+// then subtracts 1 from the stack pointer
 func (c *Cpu) op00EE() {
 	c.Pc = c.Stack[c.Sp]
 	c.Sp--
@@ -524,6 +513,7 @@ func (c *Cpu) op00EE() {
 func (c *Cpu) op1nnn(address uint16) {
 	c.Pc = address - 2
 }
+
 func (c *Cpu) op2nnn(address uint16) {
 	// Vérifiez que le pointeur de pile (SP) est dans la plage valide (0-15).
 	if c.Sp >= 15 {
@@ -566,8 +556,12 @@ func (c *Cpu) op8nn0(opcodeX, opcodeY byte) {
 
 }
 
+// Opcode 8XY1 - Opération OU (bitwise OR) =
+// Set Vx = Vx OR Vy. Performs a bitwise OR on the values of Vx and Vy, then stores the result in Vx. A
+// bit wise OR compares the corresponding bits from two values, and if either bit is 1, then the same bit in the
+// result is also 1. Otherwise, it is 0.
 func (c *Cpu) op8nn1(opcodeX, opcodeY byte) {
-	c.Registre[opcodeX] |= c.Registre[opcodeY] //??????????
+	c.Registre[opcodeX] |= c.Registre[opcodeY]
 
 }
 
