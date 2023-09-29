@@ -340,15 +340,25 @@ func (c *Cpu) decode(opcode uint16) {
 			c.op8nn4(opcodeX, opcodeY)
 
 		case 0x0005:
+
 			// Opcode 8XY5 - Soustraction avec retenue
 			// Vx -= Vy
-			c.Registre[opcodeX] -= c.Registre[opcodeY]
+			//Set Vx = Vx - Vy, set VF = NOT borrow. If Vx ¿ Vy, then VF is set to 1, otherwise 0. Then Vy is
+			//subtracted from Vx, and the results stored in Vx.
+
+			c.op8nn5(opcodeX, opcodeY)
+
 		case 0x0006:
 			// Opcode 8XY6 - Décalage à droite
-			c.Registre[0xF] = c.Registre[opcodeY] & 0x1
-			c.Registre[opcodeY] >>= 1
+			//Set Vx = Vx SHR 1. If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is
+			//divided 	by 2
+
+			c.op8nn6(opcodeX, opcodeY)
+
 		case 0x0007:
-			// Opcode 8XY7 - Soustraction inversée avec retenue
+			// Opcode 8XY7 - Soustraction inversée avec retenue =
+			//Set Vx = Vy - Vx, set VF = NOT borrow. If Vy ¿ Vx, then VF is set to 1, otherwise 0. Then Vx is
+			//subtracted from Vy, and the results stored in Vx.
 		case 0xE:
 			// Opcode 8XYE - Décalage à gauche
 			c.Registre[opcodeN4] <<= 1
@@ -532,3 +542,24 @@ func (c *Cpu) op8nn4(opcodeX, opcodeY byte) {
 		c.Registre[opcodeX] = final
 	}
 }
+
+func (c *Cpu) op8nn5(opcodeX, opcodeY byte) {
+
+	if c.Registre[opcodeX] > c.Registre[opcodeY] {
+		c.Registre[0xF] = 1
+	}
+	c.Registre[0xF] = 1
+	c.Registre[opcodeX] -= c.Registre[opcodeY]
+}
+
+func (c *Cpu) op8nn6(opcodeX, opcodeY byte) { // ????????????
+
+	if c.Registre[opcodeX]&0xF == 1 {
+		c.Registre[0xF] = 1
+	}
+	c.Registre[0xF] = 1
+
+	c.Registre[opcodeX] >>= 1
+}
+
+
