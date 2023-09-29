@@ -1,7 +1,6 @@
 package opcodes
 
 import (
-	"errors"
 	"fmt"
 	"math/rand"
 )
@@ -153,26 +152,7 @@ func (cpu *Cpu) loadROM(rombytes []byte) {
 	}
 }
 
-// Fonction stackPop
-func (c *Cpu) stackPop() (uint16, error) {
-	if c.Sp == 0 {
-		return 0, errors.New("pile vide")
-	}
-	c.Sp--
-	address := c.Stack[c.Sp]
-
-	return address, nil
-}
-
 // Fonction stackPush
-func (c *Cpu) StackPush(address uint16) {
-	// Vérifiez que le pointeur de pile (SP) est dans la plage valide (0-15).
-	if c.Sp >= 15 {
-		return
-	}
-	c.Stack[c.Sp] = address
-	c.Sp++
-}
 
 // Fonction uint16 to uint8
 func (c *Cpu) Uint16ToUint8(n uint16) (uint8, uint8) {
@@ -252,8 +232,8 @@ func (c *Cpu) decode(opcode uint16) {
 	opcodeX := byte(opcode>>8) & 0x000F  // Bits 8 à 11
 	opcodeY := byte(opcode>>4) & 0x000F  // Bits 4 à 7
 	opcodeNNN := opcode & 0x0FFF         // Bits 0 à 11
-	opcodeNN := byte(opcode & 0x00FF) // Bits 0 à 7
-	opcodeN4 := byte(opcode & 0x000F) // 4 derniers bits
+	opcodeNN := byte(opcode & 0x00FF)    // Bits 0 à 7
+	opcodeN4 := byte(opcode & 0x000F)    // 4 derniers bits
 	//x := byte(opcodeX & )
 
 	// Utilisez un switch pour gérer chaque opcode
@@ -261,11 +241,14 @@ func (c *Cpu) decode(opcode uint16) {
 	case 0x0000:
 		switch opcode {
 		case 0x00E0:
-			// Opcode 00E0 - Effacer l'écran
+			// Opcode 00E0 - Effacer l'écran =
+			// Clear the display.
 			c.op00E0()
 		case 0x00EE:
-			// Opcode 00EE - Retour de sous-routine
-			c.stackPop()
+			// Opcode 00EE - Retour de sous-routine =
+			// Return from a subroutine.The interpreter sets the program counter to the address at the top of the stack,
+			// then subtracts 1 from the stack pointer
+			c.op00EE()
 		default:
 			// Gérer les opcodes 0NNN ici (non standard)
 		}
@@ -274,10 +257,9 @@ func (c *Cpu) decode(opcode uint16) {
 		c.op1nnn(uint16(opcodeNNN)) // PTET ERREUR = opcodeN a la place
 	case 0x2000:
 		// Opcode 2NNN - Appel de sous-routine
-		c.StackPush(c.Pc)
+		c.op2nnn(opcode & 0x0FFF)
 		c.Pc = (opcode & 0x0FFF) - 2
-		// c.Pc = op1nn.address - 2
-	case 0x3000:
+	case 0x3:
 		// Opcode 3XNN - Saut conditionnel (égal)
 		if c.Registre[opcodeX] == byte(opcodeNN) {
 			c.Pc += 2
@@ -417,7 +399,7 @@ func (c *Cpu) opDxyn(opcodeX, opcodeY, opcodeN byte) {
 
 }
 
-// initialisation
+
 func (c *Cpu) op00E0() {
 	for x := 0; x < 64; x++ {
 		for y := 0; y < 32; y++ {
@@ -430,13 +412,26 @@ func (c *Cpu) op00E0() {
 func (c *Cpu) op6XNN(opcodeX, opcodeNNN byte) {
 	c.Registre[opcodeX] = opcodeNNN
 }
-
-func (c *Cpu) op1nnn(address uint16) {
-
-	c.Pc = address - 2
+func (c *Cpu) op00EE() {
+	c.Pc = c.Stack[c.Sp]
+	c.Sp--
 }
+
 
 // remet l'index à la valeur nnn
 func (c *Cpu) opAnnn(address uint16) {
 	c.I = address
+}
+
+func (c *Cpu) op1nnn(address uint16) {
+	c.Pc = address - 2
+}
+func (c *Cpu) op2nnn(address uint16) {
+	// Vérifiez que le pointeur de pile (SP) est dans la plage valide (0-15).
+	if c.Sp >= 15 {
+		return
+	}
+	c.Sp++
+	c.Pc = c.Stack[c.Sp]
+	c.Pc = address
 }
