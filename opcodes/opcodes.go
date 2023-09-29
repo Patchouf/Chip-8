@@ -252,8 +252,8 @@ func (c *Cpu) decode(opcode uint16) {
 	opcodeX := byte(opcode>>8) & 0x000F  // Bits 8 à 11
 	opcodeY := byte(opcode>>4) & 0x000F  // Bits 4 à 7
 	opcodeNNN := opcode & 0x0FFF         // Bits 0 à 11
-	// opcodeKK := uint8(opcode & 0x00FF) // Bits 0 à 7
-	opcodeN4 := uint8(opcode & 0x000F) // 4 derniers bits
+	opcodeNN := byte(opcode & 0x00FF) // Bits 0 à 7
+	opcodeN4 := byte(opcode & 0x000F) // 4 derniers bits
 	//x := byte(opcodeX & )
 
 	// Utilisez un switch pour gérer chaque opcode
@@ -277,12 +277,12 @@ func (c *Cpu) decode(opcode uint16) {
 		c.StackPush(c.Pc)
 	case 0x3:
 		// Opcode 3XNN - Saut conditionnel (égal)
-		if c.Registre[opcodeN4] == byte(opcodeNNN) {
+		if c.Registre[opcodeX] == byte(opcodeNN) {
 			c.Pc += 2
 		}
 	case 0x4:
 		// Opcode 4XNN - Saut conditionnel (différent)
-		if c.Registre[opcodeN4] != byte(opcodeNNN) {
+		if c.Registre[opcodeX] != byte(opcodeNN) {
 			c.Pc += 2
 		}
 	case 0x5:
@@ -292,11 +292,11 @@ func (c *Cpu) decode(opcode uint16) {
 		}
 	case 0x6:
 		// Opcode 6XNN - Chargement de valeur constante
-		c.op6XNN(opcodeX, opcodeN)
+		c.op6XNN(opcodeX, opcodeNN)
 		// c.Registre[opcodeN4] = byte(opcodeNNN)
 	case 0x7:
 		// Opcode 7XNN - Ajout de valeur constante
-		c.Registre[opcodeN4] += byte(opcodeNNN)
+		c.Registre[opcodeX] += byte(opcodeNN)
 	case 0x8:
 		// Gérer les opcodes 8XY0 à 8XYE
 		switch opcodeN4 {
@@ -326,6 +326,7 @@ func (c *Cpu) decode(opcode uint16) {
 			c.Registre[opcodeY] >>= 1
 		case 0x7:
 			// Opcode 8XY7 - Soustraction inversée avec retenue
+			c.Registre[0xF] = c.Registre[opcodeX] & 0x1
 		case 0xE:
 			// Opcode 8XYE - Décalage à gauche
 			c.Registre[opcodeN4] <<= 1
