@@ -257,8 +257,8 @@ func (c *Cpu) decode(opcode uint16) {
 	//x := byte(opcodeX & )
 
 	// Utilisez un switch pour gérer chaque opcode
-	switch opcodeN {
-	case 0x0:
+	switch opcode & 0xF000 {
+	case 0x0000:
 		switch opcode {
 		case 0x00E0:
 			// Opcode 00E0 - Effacer l'écran
@@ -269,123 +269,130 @@ func (c *Cpu) decode(opcode uint16) {
 		default:
 			// Gérer les opcodes 0NNN ici (non standard)
 		}
-	case 0x1:
+	case 0x1000:
 		// Opcode 1NNN - Saut
 		c.op1nnn(uint16(opcodeNNN)) // PTET ERREUR = opcodeN a la place
-	case 0x2:
+	case 0x2000:
 		// Opcode 2NNN - Appel de sous-routine
 		c.StackPush(c.Pc)
-	case 0x3:
+		c.Pc = (opcode & 0x0FFF) - 2
+		// c.Pc = op1nn.address - 2
+	case 0x3000:
 		// Opcode 3XNN - Saut conditionnel (égal)
 		if c.Registre[opcodeN4] == byte(opcodeNNN) {
 			c.Pc += 2
 		}
-	case 0x4:
+	case 0x4000:
 		// Opcode 4XNN - Saut conditionnel (différent)
 		if c.Registre[opcodeN4] != byte(opcodeNNN) {
 			c.Pc += 2
 		}
-	case 0x5:
+	case 0x5000:
 		// Opcode 5XY0 - Saut conditionnel (égalité de registres)
 		if c.Registre[opcodeX] == c.Registre[opcodeY] {
 			c.Pc += 2
 		}
-	case 0x6:
+	case 0x6000:
 		// Opcode 6XNN - Chargement de valeur constante
 		c.op6XNN(opcodeX, opcodeN)
 		// c.Registre[opcodeN4] = byte(opcodeNNN)
-	case 0x7:
+	case 0x7000:
 		// Opcode 7XNN - Ajout de valeur constante
 		c.Registre[opcodeN4] += byte(opcodeNNN)
-	case 0x8:
+	case 0x8000:
 		// Gérer les opcodes 8XY0 à 8XYE
-		switch opcodeN4 {
-		case 0x0:
+		switch opcode & 0x000F {
+		case 0x0000:
 			// Opcode 8XY0 - Copie de Registre
 			c.Registre[opcodeX] = c.Registre[opcodeY]
-		case 0x1:
+		case 0x0001:
 			// Opcode 8XY1 - Opération OU (bitwise OR)
 			c.Registre[opcodeX] |= byte(opcodeY)
-		case 0x2:
+		case 0x0002:
 			// Opcode 8XY2 - Opération ET (bitwise AND)
 			c.Registre[opcodeX] &= byte(opcodeY)
-		case 0x3:
+		case 0x0003:
 			// Opcode 8XY3 - Opération XOR (bitwise XOR)
 			c.Registre[opcodeX] ^= byte(opcodeY)
-		case 0x4:
+		case 0x0004:
 			// Opcode 8XY4 - Ajout avec retenue
 			//  Vx += Vy
 			c.Registre[opcodeX] += c.Registre[opcodeY]
-		case 0x5:
+		case 0x0005:
 			// Opcode 8XY5 - Soustraction avec retenue
 			// Vx -= Vy
 			c.Registre[opcodeX] -= c.Registre[opcodeY]
-		case 0x6:
+		case 0x0006:
 			// Opcode 8XY6 - Décalage à droite
 			c.Registre[0xF] = c.Registre[opcodeY] & 0x1
 			c.Registre[opcodeY] >>= 1
-		case 0x7:
+		case 0x0007:
 			// Opcode 8XY7 - Soustraction inversée avec retenue
-		case 0xE:
+		case 0x000E:
 			// Opcode 8XYE - Décalage à gauche
 			c.Registre[opcodeN4] <<= 1
 		default:
 			// Gérer les opcodes 8XY0 à 8XYE ici (non standard)
 		}
-	case 0x9:
+	case 0x9000:
 		// Opcode 9XY0 - Saut conditionnel (différents registres)
 		if c.Registre[opcodeX] != c.Registre[opcodeY] {
 			c.Pc += 2
 		}
-	case 0xA:
+	case 0xA000:
 		c.opAnnn(uint16(opcodeNNN)) // PTET ERREUR  PTET ERREUR = opcodeN a la place
 		// Opcode ANNN - Chargement de l'index (I)
 		c.I = opcodeNNN
-	case 0xB:
+	case 0xB000:
 		// Opcode BNNN - Saut avec offset
 		c.Pc = opcodeNNN + uint16(c.Registre[0])
 		c.Pc = opcodeNNN + uint16(c.Registre[0])
-	case 0xC:
+	case 0xC000:
 		// Opcode CXNN - Génération d'un nombre aléatoire (0 à 255)
 		c.Registre[opcodeN4] = byte(rand.Int()*256) & byte(opcodeNNN)
-	case 0xD:
+	case 0xD000:
 		// Opcode DXYN - Dessin à l'écran
 		c.opDxyn(opcodeX, opcodeY, opcodeN)
 		// Gérer l'opcode DXYN ici
 		// c.DrawSprite(opcodeN4, opcodeN4, opcodeN4)
 
-	case 0xE:
+	case 0xE000:
 		// Gérer les opcodes EX9E et EXA1
-		switch opcodeNNN {
-		case 0x9E:
+		switch opcode & 0x000F {
+		case 0x000E:
 			// Opcode EX9E - Saut si touche pressée
-		case 0xA1:
+		case 0x0001:
 			// Opcode EXA1 - Saut si touche non pressée
 		default:
 			// Gérer les opcodes EX9E et EXA1 ici (non standard)
 		}
-	case 0xF:
-		switch opcodeNNN {
-		case 0x07:
+	case 0xF000:
+		switch opcode & 0x000F {
+		case 0x0007:
 			// Opcode FX07 - Chargement du retard
 			c.Delay_timer = c.Registre[opcodeX]
-		case 0x0A:
+		case 0x000A:
 			// Opcode FX0A - Attente de touche
-		case 0x15:
-			// Opcode FX15 - Réglage du retard
-		case 0x18:
+		case 0x0005:
+			switch opcode & 0x00F0 {
+			case 0x0010:
+				// Opcode FX15 - Réglage du retard
+			case 0x0050:
+				// Opcode FX55 - Sauvegarde des registres
+			case 0x0060:
+				// Opcode FX65 - Chargement des registres
+			}
+
+		case 0x0008:
 			// Opcode FX18 - Réglage du son
-		case 0x1E:
+		case 0x000E:
 			// Opcode FX1E - Ajout de l'index (I)
-		case 0x29:
+		case 0x0009:
 			// Opcode FX29 - Chargement de l'emplacement du caractère
 
-		case 0x33:
+		case 0x0003:
 			// Opcode FX33 - Chargement des chiffres décimaux
-		case 0x55:
-			// Opcode FX55 - Sauvegarde des registres
-		case 0x65:
-			// Opcode FX65 - Chargement des registres
+
 		default:
 			// Gérer les opcodes FX07 à FX65 ici (non standard)
 		}
@@ -426,7 +433,7 @@ func (c *Cpu) op6XNN(opcodeX, opcodeNNN byte) {
 
 func (c *Cpu) op1nnn(address uint16) {
 
-	c.Pc = address
+	c.Pc = address - 2
 }
 
 // remet l'index à la valeur nnn
