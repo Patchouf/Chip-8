@@ -283,7 +283,7 @@ func (c *Cpu) decode(opcode uint16) {
 		}
 	case 0x5:
 		// Opcode 5XY0 - Saut conditionnel (égalité de registres)
-		if c.Registre[opcodeN4] == c.Registre[opcodeN4] {
+		if c.Registre[opcodeX] == c.Registre[opcodeY] {
 			c.Pc += 2
 		}
 	case 0x6:
@@ -298,23 +298,28 @@ func (c *Cpu) decode(opcode uint16) {
 		switch opcodeN4 {
 		case 0x0:
 			// Opcode 8XY0 - Copie de Registre
-			c.Registre[opcodeN4] = c.Registre[opcodeN4]
+			c.Registre[opcodeX] = c.Registre[opcodeY]
 		case 0x1:
 			// Opcode 8XY1 - Opération OU (bitwise OR)
-			c.Registre[opcodeN4] |= byte(opcodeNNN)
+			c.Registre[opcodeX] |= byte(opcodeY)
 		case 0x2:
 			// Opcode 8XY2 - Opération ET (bitwise AND)
-			c.Registre[opcodeN4] &= byte(opcodeNNN)
+			c.Registre[opcodeX] &= byte(opcodeY)
 		case 0x3:
 			// Opcode 8XY3 - Opération XOR (bitwise XOR)
-			c.Registre[opcodeN4] ^= byte(opcodeNNN)
+			c.Registre[opcodeX] ^= byte(opcodeY)
 		case 0x4:
 			// Opcode 8XY4 - Ajout avec retenue
+			//  Vx += Vy
+			c.Registre[opcodeX] += c.Registre[opcodeY]
 		case 0x5:
 			// Opcode 8XY5 - Soustraction avec retenue
+			// Vx -= Vy
+			c.Registre[opcodeX] -= c.Registre[opcodeY]
 		case 0x6:
 			// Opcode 8XY6 - Décalage à droite
-			c.Registre[opcodeN4] >>= 1
+			c.Registre[0xF] = c.Registre[opcodeY] & 0x1
+			c.Registre[opcodeY] >>= 1
 		case 0x7:
 			// Opcode 8XY7 - Soustraction inversée avec retenue
 		case 0xE:
@@ -325,7 +330,7 @@ func (c *Cpu) decode(opcode uint16) {
 		}
 	case 0x9:
 		// Opcode 9XY0 - Saut conditionnel (différents registres)
-		if c.Registre[opcodeN4] != c.Registre[opcodeN4] {
+		if c.Registre[opcodeX] != c.Registre[opcodeY] {
 			c.Pc += 2
 		}
 	case 0xA:
@@ -334,7 +339,7 @@ func (c *Cpu) decode(opcode uint16) {
 		// c.I = opcodeNNN
 	case 0xB:
 		// Opcode BNNN - Saut avec offset
-		// c.Pc = opcodeNNN + uint16(c.Registre[0])
+		c.Pc = opcodeNNN + uint16(c.Registre[0])
 	case 0xC:
 		// Opcode CXNN - Génération d'un nombre aléatoire (0 à 255)
 		c.Registre[opcodeN4] = byte(rand.Int()*256) & byte(opcodeNNN)
@@ -342,8 +347,7 @@ func (c *Cpu) decode(opcode uint16) {
 		// Opcode DXYN - Dessin à l'écran
 		c.opDxyn(opcodeX, opcodeY, opcodeN)
 		// Gérer l'opcode DXYN ici
-		c.DrawSprite(opcodeN4, opcodeN4, opcodeN4)
-		break
+		// c.DrawSprite(opcodeN4, opcodeN4, opcodeN4)
 
 	case 0xE:
 		// Gérer les opcodes EX9E et EXA1
@@ -359,6 +363,7 @@ func (c *Cpu) decode(opcode uint16) {
 		switch opcodeNNN {
 		case 0x07:
 			// Opcode FX07 - Chargement du retard
+			c.Delay_timer = c.Registre[opcodeX]
 		case 0x0A:
 			// Opcode FX0A - Attente de touche
 		case 0x15:
@@ -369,6 +374,7 @@ func (c *Cpu) decode(opcode uint16) {
 			// Opcode FX1E - Ajout de l'index (I)
 		case 0x29:
 			// Opcode FX29 - Chargement de l'emplacement du caractère
+
 		case 0x33:
 			// Opcode FX33 - Chargement des chiffres décimaux
 		case 0x55:
@@ -407,7 +413,9 @@ func (c *Cpu) op00E0() {
 func (c *Cpu) op6XNN(opcodeX, opcodeNNN byte) {
 	c.Registre[opcodeX] = opcodeNNN
 }
+
 func (c *Cpu) op1nnn(address uint16) {
+
 	c.Pc = address
 }
 
