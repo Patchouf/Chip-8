@@ -3,6 +3,8 @@ package opcodes
 import (
 	"fmt"
 	"math/rand"
+
+	"main.go/opcodes"
 )
 
 type Cpu struct {
@@ -424,29 +426,49 @@ func (c *Cpu) decode(opcode uint16) {
 		//Set Vx = random byte AND kk. The interpreter generates a random number from 0 to 255, which is then
 		//ANDed with the value kk. The results are stored in Vx. See instruction 8xy2 for more information on AND.
 
-		c.Registre[opcodeN4] = byte(rand.Int()*256) & byte(opcodeNNN)
+		c.opCxkk(opcodeX, opcodeNN)
 
 	case 0xD000:
-		// Opcode DXYN - Dessin à l'écran
-		c.opDxyn(opcodeX, opcodeY, opcodeN)
+
+		// Opcode DXYN - Dessin à l'écran =
 		// Gérer l'opcode DXYN ici
-		// c.DrawSprite(opcodeN4, opcodeN4, opcodeN4)
+		//Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision. The interpreter reads n
+		//bytes from memory, starting at the address stored in I. These bytes are then displayed as sprites on screen
+		//at coordinates (Vx, Vy). Sprites are XOR’d onto the existing screen. If this causes any pixels to be erased,
+		//VF is set to 1, otherwise it is set to 0. If the sprite is positioned so part of it is outside the coordinates of
+		//the display, it wraps around to the opposite side of the screen.
+
+		c.opDxyn(opcodeX, opcodeY, opcodeN)
 
 	case 0xE000:
-		// Gérer les opcodes EX9E et EXA1
+
+		// Gérer les opcodes EX9E et EXA1 = 
+
 		switch opcode & 0x000F {
 		case 0x000E:
-			// Opcode EX9E - Saut si touche pressée
+
+		// Opcode EX9E - Saut si touche pressée =
+		//Skip next instruction if key with the value of Vx is pressed. Checks the keyboard, and if the key corresponding
+		//to the value of Vx is currently in the down position, PC is increased by 2.
+
+
+
 		case 0x0001:
+
 			// Opcode EXA1 - Saut si touche non pressée
+
 		default:
 			// Gérer les opcodes EX9E et EXA1 ici (non standard)
 		}
 	case 0xF000:
 		switch opcode & 0x000F {
+
 		case 0x0007:
+
 			// Opcode FX07 - Chargement du retard
+
 			c.Delay_timer = c.Registre[opcodeX]
+
 		case 0x000A:
 			// Opcode FX0A - Attente de touche
 		case 0x0005:
@@ -461,6 +483,9 @@ func (c *Cpu) decode(opcode uint16) {
 
 		case 0x0008:
 			// Opcode FX18 - Réglage du son
+
+
+
 		case 0x000E:
 			// Opcode FX1E - Ajout de l'index (I)
 		case 0x0009:
@@ -478,20 +503,6 @@ func (c *Cpu) decode(opcode uint16) {
 }
 
 // dessine les pixels
-func (c *Cpu) opDxyn(opcodeX, opcodeY, opcodeN byte) {
-	xval := c.Registre[opcodeX]
-	yval := c.Registre[opcodeY]
-	c.Registre[0xF] = 0
-	var i byte = 0
-	for ; i < opcodeN; i++ {
-		row := c.Memory[c.I+uint16(i)]
-		if erased := c.DrawSprite(xval, yval+i, row); erased {
-			c.Registre[0xF] = 1
-		}
-
-	}
-
-}
 
 func (c *Cpu) op00E0() {
 	for x := 0; x < 64; x++ {
@@ -642,3 +653,29 @@ func (c *Cpu) opCxkk(opcodeX, opcodeNN byte) {
 
 	c.Registre[opcodeX] = byte(rand.Int()*256) & opcodeNN
 }
+
+func (c *Cpu) opDxyn(opcodeX, opcodeY, opcodeN byte) {
+	xval := c.Registre[opcodeX]
+	yval := c.Registre[opcodeY]
+	c.Registre[0xF] = 0
+	var i byte = 0
+	for ; i < opcodeN; i++ {
+		row := c.Memory[c.I+uint16(i)]
+		if del := c.DrawSprite(xval, yval+i, row); del {
+			c.Registre[0xF] = 1
+		}
+	}
+}
+
+// TODO = OPCODE TOUCHE ICI 0x000E 0x0001
+
+
+func (c *Cpu) opE00E (opcodeX byte) {
+
+	if c.Key == c.Registre[opcodeX] {
+		c.Pc += 2
+	}
+	
+
+}
+
