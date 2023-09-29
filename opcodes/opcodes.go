@@ -124,6 +124,7 @@ func (cpu *Cpu) initialiseFont() {
 	cpu.Memory[0x09F] = 0x80
 }
 
+// Initialisation du cpu
 func InitCpu(cpu *Cpu, rombytes []byte) {
 	cpu.initialiseFont()
 	cpu.loadROM(rombytes)
@@ -132,6 +133,7 @@ func InitCpu(cpu *Cpu, rombytes []byte) {
 
 }
 
+// Update du cpu
 func (cpu *Cpu) Update() {
 	cpu.Pc += 2
 	op1 := cpu.Memory[cpu.Pc]
@@ -143,6 +145,7 @@ func (cpu *Cpu) Update() {
 	cpu.decode(opcode)
 }
 
+// chargement du rom
 func (cpu *Cpu) loadROM(rombytes []byte) {
 	cpu.Romlength = uint16(len(rombytes))
 	for i, byt := range rombytes {
@@ -221,6 +224,7 @@ func (c *Cpu) Uint8ToUint4(n uint8) (uint8, uint8) {
 // 	return c.Registre[0xF] == 1
 // }
 
+// DrawSprite dessine un sprite à l'écran et renvoie true si un pixel a été effacé
 func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
 	erased := false
 	yIndex := y % 64
@@ -241,7 +245,7 @@ func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
 	return erased
 }
 
-// Decode décode un opcode et exécute l'instruction correspondante.
+// décodage d'un opcode et exécute l'instruction correspondante.
 func (c *Cpu) decode(opcode uint16) {
 	// Diviser l'opcode en parties individuelles PROBLEME
 	opcodeN := byte(opcode>>12) & 0x000F // 4 premiers bits
@@ -331,10 +335,10 @@ func (c *Cpu) decode(opcode uint16) {
 	case 0xA:
 		c.opAnnn(uint16(opcodeNNN)) // PTET ERREUR  PTET ERREUR = opcodeN a la place
 		// Opcode ANNN - Chargement de l'index (I)
-		// c.I = opcodeNNN
+		c.I = opcodeNNN
 	case 0xB:
 		// Opcode BNNN - Saut avec offset
-		// c.Pc = opcodeNNN + uint16(c.Registre[0])
+		c.Pc = opcodeNNN + uint16(c.Registre[0])
 	case 0xC:
 		// Opcode CXNN - Génération d'un nombre aléatoire (0 à 255)
 		c.Registre[opcodeN4] = byte(rand.Int()*256) & byte(opcodeNNN)
@@ -383,6 +387,7 @@ func (c *Cpu) decode(opcode uint16) {
 	}
 }
 
+// dessine les pixels
 func (c *Cpu) opDxyn(opcodeX, opcodeY, opcodeN byte) {
 	xval := c.Registre[opcodeX]
 	yval := c.Registre[opcodeY]
@@ -397,6 +402,8 @@ func (c *Cpu) opDxyn(opcodeX, opcodeY, opcodeN byte) {
 	}
 
 }
+
+// initialisation
 func (c *Cpu) op00E0() {
 	for x := 0; x < 64; x++ {
 		for y := 0; y < 32; y++ {
@@ -404,13 +411,18 @@ func (c *Cpu) op00E0() {
 		}
 	}
 }
+
+// stock les données
 func (c *Cpu) op6XNN(opcodeX, opcodeNNN byte) {
 	c.Registre[opcodeX] = opcodeNNN
 }
+
+// saut
 func (c *Cpu) op1nnn(address uint16) {
 	c.Pc = address
 }
 
+// remet l'index à la valeur nnn
 func (c *Cpu) opAnnn(address uint16) {
 	c.I = address
 }
