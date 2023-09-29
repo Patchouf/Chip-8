@@ -371,7 +371,6 @@ func (c *Cpu) decode(opcode uint16) {
 			// Opcode FX1E - Ajout de l'index (I)
 		case 0x0009:
 			// Opcode FX29 - Chargement de l'emplacement du caractère
-
 		case 0x0003:
 			// Opcode FX33 - Chargement des chiffres décimaux
 
