@@ -169,41 +169,6 @@ func (c *Cpu) Uint8ToUint4(n uint8) (uint8, uint8) {
 	return uint8(n >> 4), uint8(n & 0x0F)
 }
 
-// func (c *Cpu) DrawSprite(X, Y, height byte) bool {
-// 	ScreenWidth := uint16(c.Registre[X])
-// 	ScreenHeight := uint16(c.Registre[Y])
-
-// 	c.Registre[0xF] = 0
-
-// 	// Parcourez les lignes du sprite.
-// 	for row := byte(0); row < height; row++ {
-// 		spriteByte := c.Memory[c.I+uint16(row)]
-
-// 		for bit := byte(0); bit < 8; bit++ {
-
-// 			if (spriteByte & (0x80 >> bit)) != 0 {
-
-// 				x := int(ScreenWidth) + int(bit)
-// 				y := int(ScreenHeight) + int(row)
-
-// 				if x < 64 && y < 32 {
-
-// 					index := y*64 + x
-
-// 					if c.Gfx[index][0] == byte(1) {
-
-// 						c.Registre[0xF] = 1
-// 					}
-// 					for i := 0; i < len(c.Gfx[index]); i++ {
-// 						c.Gfx[index][i] ^= byte(1)
-// 					}
-// 				}
-// 			}
-// 		}
-// 	}
-// 	return c.Registre[0xF] == 1
-// }
-
 // DrawSprite dessine un sprite à l'écran et renvoie true si un pixel a été effacé
 func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
 	erased := false
@@ -223,21 +188,20 @@ func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
 	return erased
 }
 
-
 // décodage d'un opcode et exécute l'instruction correspondante.
 func (c *Cpu) decode(opcode uint16) {
 	// Diviser l'opcode en parties individuelles PROBLEME
 	// opcodeN := byte(opcode>>12) & 0x000F // 4 premiers bits
-	opcodeX := byte(opcode>>8) & 0x000F  // Bits 8 à 11
-	opcodeY := byte(opcode>>4) & 0x000F  // Bits 4 à 7
-	opcodeNNN := opcode & 0x0FFF         // Bits 0 à 11
-	opcodeNN := byte(opcode & 0x00FF)    // Bits 0 à 7
-	opcodeN4 := byte(opcode & 0x000F)    // 4 derniers bits
+	opcodeX := byte(opcode>>8) & 0x000F // Bits 8 à 11
+	opcodeY := byte(opcode>>4) & 0x000F // Bits 4 à 7
+	opcodeNNN := opcode & 0x0FFF        // Bits 0 à 11
+	opcodeNN := byte(opcode & 0x00FF)   // Bits 0 à 7
+	opcodeN4 := byte(opcode & 0x000F)   // 4 derniers bits
 	//x := byte(opcodeX & )
 
 	// Utilisez un switch pour gérer chaque opcode
 	switch opcode & 0xF000 {
-	case 0x0000:
+	case 0x0:
 		switch opcode {
 		case 0x00E0:
 			c.op00E0()
@@ -261,7 +225,7 @@ func (c *Cpu) decode(opcode uint16) {
 
 		c.op2nnn(opcode & 0x0FFF)
 
-	case 0x3:
+	case 0x3000:
 
 		// Opcode 3XNN - Saut conditionnel (égal) =
 		// Skip next instruction if Vx = kk. The interpreter compares register Vx to kk, and if they are equal,
