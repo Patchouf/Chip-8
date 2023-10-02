@@ -28,9 +28,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	for x, row := range g.cpu.Gfx {
 		for y, pixel := range row {
 			if pixel == 1 {
-				screen.Set(x, y, color.White)
+				screen.Set(x, y, color.RGBA{R: 255, G: 205, B: 1, A: 255})
 			} else {
-				screen.Set(x, y, color.Black)
+				screen.Set(x, y, color.RGBA{R: 153, G: 102, B: 1, A: 255})
 			}
 		}
 	}
