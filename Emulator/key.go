@@ -28,3 +28,7 @@ func RefreshKeys(chip8 *Clavier) {
 type Clavier struct {
 	IsPressed [16]bool
 }
+
+func (clavier *Clavier) GetKey(key byte) bool {
+	return clavier.IsPressed[key]
+}

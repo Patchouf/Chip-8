@@ -173,10 +173,6 @@ func (c *Cpu) opCxkk(opcodeX, opcodeNN byte) {
 	c.Registre[opcodeX] = byte(rand.Int()*256) & opcodeNN
 }
 
-func (clavier *Clavier) GetKey(key byte) bool {
-	return clavier.IsPressed[key]
-}
-
 // dessine les pixels
 func (c *Cpu) opDxyn(opcodeX, opcodeY, opcodeN byte) {
 	xval := c.Registre[opcodeX]
@@ -191,4 +187,29 @@ func (c *Cpu) opDxyn(opcodeX, opcodeY, opcodeN byte) {
 
 	}
 
+}
+
+// 
+
+// Opcode FX15 - Réglage du retard
+func (c *Cpu) opFx15(opcodeX byte) {
+	c.Delay_timer = c.Registre[opcodeX]
+}
+
+// Opcode FX07 - Chargement du retard
+func (c *Cpu) opFx07(opcodeX byte) {
+	c.Registre[opcodeX] = c.Delay_timer
+}
+
+// Opcode FX55 - Sauvegarde des registres
+func (c *Cpu) opFx55(opcodeX byte) {
+	for i := byte(0); i <= opcodeX; i++ {
+		c.Memory[c.I+uint16(i)] = c.Registre[i]
+	}
+}
+
+func (c *Cpu) opFx65(opcodeX byte) {
+	for i := byte(0); i <= opcodeX; i++ {
+		c.Registre[i] = c.Memory[c.I+uint16(i)]
+	}
 }
