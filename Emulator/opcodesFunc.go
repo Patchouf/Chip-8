@@ -1,6 +1,7 @@
 package emulator
 
 import (
+	"fmt"
 	"math/rand"
 )
 
@@ -187,13 +188,26 @@ func (c *Cpu) op8xy5(opcodeX, opcodeY byte) {
 // divided 	by 2
 func (c *Cpu) op8nn6(opcodeX, opcodeY byte) {
 	// c.Registre[opcodeX] = c.Registre[opcodeX] >> 1
-	if c.Registre[opcodeX]&0xFF == 1 {
+	// 	if c.Registre[opcodeX]&0xFF == 1 {
+	// 		c.Registre[0xF] = 1
+	// 	} else {
+	// 		c.Registre[0xF] = 0
+	// 	}
+
+	// 	c.Registre[opcodeX] >>= 1
+	// }
+
+	if c.Registre[opcodeX]%2 == 1 {
+
 		c.Registre[0xF] = 1
 	} else {
+
 		c.Registre[0xF] = 0
 	}
+	c.Registre[opcodeX] = c.Registre[opcodeX] / 2
 
-	c.Registre[opcodeX] /= 2
+	fmt.Println("test", c.Registre[opcodeX])
+
 }
 
 // Opcode 8XY7 - Soustraction inversée avec retenue =
@@ -202,7 +216,7 @@ func (c *Cpu) op8nn6(opcodeX, opcodeY byte) {
 func (c *Cpu) op8xy7(opcodeX, opcodeY byte) {
 	// for c.Registre[opcodeY] != c.Registre[opcodeX] {
 	c.Registre[opcodeX] = c.Registre[opcodeY] - c.Registre[opcodeX]
-	if c.Registre[opcodeY] > c.Registre[opcodeX] || c.Registre[opcodeY] == c.Registre[opcodeX] {
+	if c.Registre[opcodeY] >= c.Registre[opcodeX] {
 		c.Registre[0xF] = 1
 	} else {
 		c.Registre[0xF] = 0
