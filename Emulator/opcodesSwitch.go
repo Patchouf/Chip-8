@@ -1,9 +1,8 @@
 package emulator
 
-// décodage d'un opcode et exécute l'instruction correspondante.
+// Fonction pour décoder les opcodes
 func (c *Cpu) decode(opcode uint16) {
 	// Diviser l'opcode en parties individuelles pour faciliter le décodage
-	// opcodeN := byte(opcode>>12) & 0x000F // 4 premiers bits
 	opcodeX := byte(opcode>>8) & 0x000F // Bits 8 à 11
 	opcodeY := byte(opcode>>4) & 0x000F // Bits 4 à 7
 	opcodeNNN := opcode & 0x0FFF        // Bits 0 à 11
@@ -18,7 +17,6 @@ func (c *Cpu) decode(opcode uint16) {
 		case 0x00EE:
 			c.op00EE()
 		default:
-			// Gérer les opcodes 0NNN ici (non standard)
 		}
 	case 0x1000:
 		c.op1nnn(uint16(opcodeNNN)) // PTET ERREUR = opcodeN a la place
@@ -56,7 +54,6 @@ func (c *Cpu) decode(opcode uint16) {
 		case 0xE:
 			c.op8nnE(opcodeX, opcodeY)
 		default:
-			// Gérer les opcodes 8XY0 à 8XYE ici (non standard)
 		}
 	case 0x9000:
 		c.op9nn0(opcodeX, opcodeY)
@@ -65,10 +62,7 @@ func (c *Cpu) decode(opcode uint16) {
 	case 0xB000:
 		c.opBnnn(opcodeNNN)
 	case 0xC000:
-		// Opcode CXNN - Génération d'un nombre aléatoire (0 à 255) =
-		//Set Vx = random byte AND kk. The interpreter generates a random number from 0 to 255, which is then
-		//ANDed with the value kk. The results are stored in Vx. See instruction 8xy2 for more information on AND.
-		c.Registre[opcodeX] = byte(rand.Int()*256) & byte(opcodeNN)
+		c.opCxkk(opcodeX, opcodeNN)
 	case 0xD000:
 		c.opDxyn(opcodeX, opcodeY, opcodeN4)
 	case 0xE000:
@@ -79,7 +73,6 @@ func (c *Cpu) decode(opcode uint16) {
 		case 0x0001:
 			// Opcode EXA1 - Saut si touche non pressée
 		default:
-			// Gérer les opcodes EX9E et EXA1 ici (non standard)
 		}
 	case 0xF000:
 		switch opcode & 0x000F {
@@ -96,21 +89,18 @@ func (c *Cpu) decode(opcode uint16) {
 			case 0x0060:
 				c.opFx65(opcodeX)
 			default:
-				// Gérer les opcodes FX07 à FX65 ici (non standard)
 			}
 		case 0x0008:
 			c.opFx18(opcodeX)
 		case 0x000E:
 			c.opFx1E(opcodeX)
-			// Opcode FX1E - Ajout de l'index (I)
 		case 0x0009:
 			// Opcode FX29 - Chargement de l'emplacement du caractère
 		case 0x0003:
 			c.opFx33(opcodeX)
 		default:
-			// Gérer les opcodes FX07 à FX65 ici (non standard)
 		}
 	default:
-		// Gérer les opcodes non pris en charge ou inconnus ici
+
 	}
 }

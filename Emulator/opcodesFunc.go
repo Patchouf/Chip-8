@@ -2,6 +2,7 @@ package emulator
 
 import (
 	"math/rand"
+	"vendor/golang.org/x/net/dns/dnsmessage"
 )
 
 func (c *Cpu) StackPush(address uint16) {
@@ -286,7 +287,6 @@ func (c *Cpu) opFx18(opcodeX byte) {
 	c.Sound_timer = c.Registre[opcodeX]
 }
 
-
 // Opcode FX33 - Chargement des chiffres décimaux
 // Store BCD representation of Vx in memory locations I, I+1, and I+2. The interpreter takes the decimal
 //value of Vx, and places the hundreds digit in memory at location in I, the tens digit at location I+1, and
@@ -295,13 +295,13 @@ func (c *Cpu) opFx18(opcodeX byte) {
 func (c *Cpu) opFx33(opcodeX byte) {
 	value := c.Registre[opcodeX]
 
-    // Obtenez les chiffres décimaux individuels
-    hundreds := value / 100
-    value %= 100
-    tens := value / 10
-    ones := value % 10
+	// Pour obtenir les chiffres individuels
+	hundreds := value / 100
+	value %= 100
+	tens := value / 10
+	ones := value % 10
 
-	// Stockez les chiffres décimaux dans la mémoire à partir de l'adresse I
+	// Stock les chiffres décimaux dans la mémoire à partir de l'adresse I
 	c.Memory[c.I] = hundreds
 	c.Memory[c.I+1] = tens
 	c.Memory[c.I+2] = ones
@@ -312,3 +312,12 @@ func (c *Cpu) opFx33(opcodeX byte) {
 func (c *Cpu) opFx1E(opcodeX byte) {
 	c.I += uint16(c.Registre[opcodeX])
 }
+
+
+func (c *Cpu) opEX9E(opcodeX byte) {
+    keyIndex := c.Registre[opcodeX] 
+    
+    if clavier.IsPressed[keyIndex] {
+		c.Pc += 2
+	}	
+	}
