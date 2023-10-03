@@ -341,6 +341,7 @@ func (c *Cpu) opEX9E(opcodeX byte, clavier *Clavier) {
 	}
 }
 
+// Opcode EXA1 - Saut si touche non pressée
 func (c *Cpu) opEXA1(opcodeX byte, clavier *Clavier) {
 	keyIndex := c.Registre[opcodeX]
 
