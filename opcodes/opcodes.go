@@ -1,6 +1,7 @@
 package opcodes
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 )
@@ -18,8 +19,8 @@ type Cpu struct {
 	Romlength   uint16
 }
 
-type Object struct {
-	Clavier [16]byte
+type Clavier struct {
+	IsPressed [16]bool
 }
 
 func (cpu *Cpu) initialiseFont() {
@@ -139,8 +140,8 @@ func (cpu *Cpu) Update() {
 	op2 := cpu.Memory[cpu.Pc+1]
 	// fmt.Println(op1, " ", op2)
 	opcode := cpu.uint8ToUint16(op1, op2)
-	fmt.Printf("%02x", opcode)
-	fmt.Println()
+	// fmt.Printf("%02x", opcode)
+	// fmt.Println()
 	cpu.decode(opcode)
 }
 
@@ -259,10 +260,9 @@ func (c *Cpu) decode(opcode uint16) {
 		// Opcode 2NNN - Appel de sous-routine =
 		// Call subroutine at nnn. The interpreter increments the stack pointer, then puts the current PC on the top
 		//of the stack. The PC is then set to nnn.
+		// c.op2nnn(uint16(opcodeNNN), 0x00)
 
-		c.op2nnn(opcode & 0x0FFF)
-
-	case 0x3:
+	case 0x3000:
 
 		// Opcode 3XNN - Saut conditionnel (égal) =
 		// Skip next instruction if Vx = kk. The interpreter compares register Vx to kk, and if they are equal,
@@ -400,7 +400,7 @@ func (c *Cpu) decode(opcode uint16) {
 		// Opcode BNNN - Saut avec offset =
 		//Jump to location nnn + V0. The program counter is set to nnn plus the value of V0
 
-		c.opBnnn(uint16(opcodeNNN))
+		c.opBnnn(opcodeNNN) // PTET ERREUR  PTET ERREUR = opcodeN a la place
 
 	case 0xC000:
 
@@ -495,26 +495,42 @@ func (c *Cpu) op6XNN(opcodeX, opcodeNNN byte) {
 // Return from a subroutine.The interpreter sets the program counter to the address at the top of the stack,
 // then subtracts 1 from the stack pointer
 func (c *Cpu) op00EE() {
-	c.Pc = c.Stack[c.Sp]
-	c.Sp--
+	addr, err := c.stackPop()
+	if err != nil {
+		fmt.Println(err)
+	}
+	c.Pc = addr - 2
 }
 
 func (c *Cpu) op1nnn(address uint16) {
 	c.Pc = address - 2
 }
 
-func (c *Cpu) op2nnn(address uint16) {
+func (c *Cpu) op2nnn(address uint16, opcodeNNN byte) {
+	// Vérifiez que le pointeur de pile (SP) est dans la plage valide (0-15).
+	c.StackPush(c.Pc)
+	c.Pc = address - 2
+}
+func (c *Cpu) StackPush(address uint16) {
 	// Vérifiez que le pointeur de pile (SP) est dans la plage valide (0-15).
 	if c.Sp >= 15 {
 		return
 	}
+	c.Stack[c.Sp] = address
 	c.Sp++
-	c.Pc = c.Stack[c.Sp]
-	c.Pc = address
+}
+func (c *Cpu) stackPop() (uint16, error) {
+	if c.Sp == 0 {
+		return 0, errors.New("pile vide")
+	}
+	c.Sp--
+	address := c.Stack[c.Sp]
+
+	return address, nil
 }
 
-func (c *Cpu) op3nnn(opcodeX, opcodeNN byte) {
-	if c.Registre[opcodeX] == opcodeNN {
+func (c *Cpu) op3nnn(opcodeX, opcodeNNN byte) {
+	if c.Registre[opcodeX] == opcodeNNN {
 		c.Pc += 2
 	}
 }

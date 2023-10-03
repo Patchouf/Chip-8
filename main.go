@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
 	"log"
 	"os"
@@ -28,9 +27,9 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	for x, row := range g.cpu.Gfx {
 		for y, pixel := range row {
 			if pixel == 1 {
-				screen.Set(x, y, color.RGBA{R: 255, G: 205, B: 1, A: 255})
+				screen.Set(x, y, color.White)
 			} else {
-				screen.Set(x, y, color.RGBA{R: 153, G: 102, B: 1, A: 255})
+				screen.Set(x, y, color.Black)
 			}
 		}
 	}
@@ -50,10 +49,10 @@ func main() {
 
 	var game Game
 	opcodes.InitCpu(&game.cpu, rombytes)
-	fmt.Println(game.cpu.Memory)
+	// fmt.Println(game.cpu.Memory)
 
 	ebiten.SetWindowSize(640, 320)
-	ebiten.SetWindowTitle("Chip8 Emulator :  " + filename[6:])
+	ebiten.SetWindowTitle("Chip8 Emulator")
 	ebiten.RunGame(&game)
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
@@ -71,14 +70,14 @@ func readROM(filename string) []byte {
 }
 
 // fonction pour print le rom
-func PrintROM(rom []byte) {
-	for i, byt := range rom {
-		if i%2 == 0 {
-			fmt.Printf("0x%03x: ", 0x200+i)
-		}
-		fmt.Printf("%02x", byt)
-		if i%2 == 1 {
-			fmt.Print("\n")
-		}
-	}
-}
+// func PrintROM(rom []byte) {
+// 	for i, byt := range rom {
+// 		if i%2 == 0 {
+// 			fmt.Printf("0x%03x: ", 0x200+i)
+// 		}
+// 		fmt.Printf("%02x", byt)
+// 		if i%2 == 1 {
+// 			fmt.Print("\n")
+// 		}
+// 	}
+// }
