@@ -205,18 +205,19 @@ func (c *Cpu) decode(opcode uint16) {
 	case 0xF000:
 		switch opcode & 0x000F {
 		case 0x0007:
-			// Opcode FX07 - Chargement du retard
-			c.Delay_timer = c.Registre[opcodeX]
+			c.opFx07(opcodeX)
 		case 0x000A:
 			// Opcode FX0A - Attente de touche
 		case 0x0005:
 			switch opcode & 0x00F0 {
 			case 0x0010:
-				// Opcode FX15 - Réglage du retard
+				c.opFx15(opcodeX)
 			case 0x0050:
-				// Opcode FX55 - Sauvegarde des registres
+				c.opFx55(opcodeX)
 			case 0x0060:
-				// Opcode FX65 - Chargement des registres
+				c.opFx65(opcodeX)
+			default:
+				// Gérer les opcodes FX07 à FX65 ici (non standard)
 			}
 
 		case 0x0008:
