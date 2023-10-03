@@ -636,3 +636,4 @@ func (c *Cpu) opCxkk(opcodeX, opcodeNN byte) {
 
 	c.Registre[opcodeX] = byte(rand.Int()*256) & opcodeNN
 }
+
