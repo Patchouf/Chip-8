@@ -105,8 +105,8 @@ func (c *Cpu) op8nn0(opcodeX, opcodeY byte) {
 // Set Vx = Vx OR Vy. Performs a bitwise OR on the values of Vx and Vy, then stores the result in Vx. A
 // bit wise OR compares the corresponding bits from two values, and if either bit is 1, then the same bit in the
 // result is also 1. Otherwise, it is 0.
-func (c *Cpu) op8nn1(opcodeX, opcodeY byte) {
-	c.Registre[opcodeX] |= c.Registre[opcodeY]
+func (c *Cpu) op8nn1(x, y byte) {
+	c.Registre[x] |= c.Registre[y]
 
 }
 
@@ -134,40 +134,60 @@ func (c *Cpu) op8nn3(opcodeX, opcodeY byte) {
 //in Vx.
 
 // Vx += Vy
-func (c *Cpu) op8nn4(opcodeX, opcodeY byte) {
+func (c *Cpu) op8xy4(opcodeX, opcodeY byte) {
 
-	final := c.Registre[opcodeX] + c.Registre[opcodeY]
+	var a uint16 = uint16(c.Registre[opcodeX])
+	var b uint16 = uint16(c.Registre[opcodeY])
 
+	final := a + b
 	if final > 255 {
-		c.Registre[0xF] = 1
-		c.Registre[opcodeX] = 255
+		c.Registre[0xF] = 0x1
 	} else {
-		c.Registre[0xF] = 0
-		c.Registre[opcodeX] = final
+		c.Registre[0xF] = 0x0
 	}
+	if opcodeX != 0xF {
+		c.Registre[opcodeX] = byte(final)
+	}
+	// if final > 255 {
+	// 	c.Registre[0xF] = 1
+	// 	c.Registre[x] = 255
+	// } else {
+	// 	c.Registre[0xF] = 0
+	// 	c.Registre[x] = final
+	// }
 }
 
 // Opcode 8XY5 - Soustraction avec retenue
 // Vx -= Vy
 // Set Vx = Vx - Vy, set VF = NOT borrow. If Vx ¿ Vy, then VF is set to 1, otherwise 0. Then Vy is
 // subtracted from Vx, and the results stored in Vx.
-func (c *Cpu) op8nn5(opcodeX, opcodeY byte) {
-
-	if c.Registre[opcodeX] > c.Registre[opcodeY] {
+func (c *Cpu) op8xy5(opcodeX, opcodeY byte) {
+	// var noused byte
+	// if c.Registre[opcodeX] > c.Registre[opcodeY] {
+	// 	noused = 1
+	// }
+	// c.Registre[0xF] = noused
+	// c.Registre[opcodeX] = c.Registre[opcodeX] - c.Registre[opcodeY]
+	// if c.Registre[opcodeX] > c.Registre[opcodeY] || c.Registre[opcodeX] == c.Registre[opcodeY] {
+	// 	c.Registre[0xF] = 0
+	// } else {
+	// 	c.Registre[0xF] = 1
+	// }
+	c.Registre[opcodeX] = c.Registre[opcodeX] - c.Registre[opcodeY]
+	if c.Registre[opcodeY] > c.Registre[opcodeX] || c.Registre[opcodeX] == c.Registre[opcodeY] {
 		c.Registre[0xF] = 1
 	} else {
 		c.Registre[0xF] = 0
 	}
-
-	c.Registre[opcodeX] -= c.Registre[opcodeY]
+	// c.Registre[opcodeX] -= c.Registre[opcodeY]
 }
 
 // Opcode 8XY6 - Décalage à droite
 // Set Vx = Vx SHR 1. If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is
 // divided 	by 2
 func (c *Cpu) op8nn6(opcodeX, opcodeY byte) {
-
-	if c.Registre[opcodeX]&0xF == 1 {
+	// c.Registre[opcodeX] = c.Registre[opcodeX] >> 1
+	if c.Registre[opcodeX]&0xFF == 1 {
 		c.Registre[0xF] = 1
 	} else {
 		c.Registre[0xF] = 0
@@ -179,14 +199,16 @@ func (c *Cpu) op8nn6(opcodeX, opcodeY byte) {
 // Opcode 8XY7 - Soustraction inversée avec retenue =
 // Set Vx = Vy - Vx, set VF = NOT borrow. If Vy ¿ Vx, then VF is set to 1, otherwise 0. Then Vx is
 // subtracted from Vy, and the results stored in Vx.
-func (c *Cpu) op8nn7(opcodeX, opcodeY byte) {
-
-	if c.Registre[opcodeY] > c.Registre[opcodeX] {
+func (c *Cpu) op8xy7(opcodeX, opcodeY byte) {
+	// for c.Registre[opcodeY] != c.Registre[opcodeX] {
+	c.Registre[opcodeX] = c.Registre[opcodeY] - c.Registre[opcodeX]
+	if c.Registre[opcodeY] > c.Registre[opcodeX] || c.Registre[opcodeY] == c.Registre[opcodeX] {
 		c.Registre[0xF] = 1
 	} else {
 		c.Registre[0xF] = 0
 	}
-	c.Registre[opcodeX] = c.Registre[opcodeY] - c.Registre[opcodeX]
+	// c.Registre[opcodeX] = c.Registre[opcodeY] - c.Registre[opcodeX]
+	// }
 }
 
 // Opcode 8XYE - Décalage à gauche =
@@ -245,8 +267,6 @@ func (c *Cpu) opDxyn(opcodeX, opcodeY, opcodeN byte) {
 	}
 
 }
-
-//
 
 // Opcode FX15 - Réglage du retard =
 // Set delay timer = Vx. Delay Timer is set equal to the value of Vx.
