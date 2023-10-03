@@ -1,7 +1,5 @@
 package emulator
 
-import "math/rand"
-
 // décodage d'un opcode et exécute l'instruction correspondante.
 func (c *Cpu) decode(opcode uint16) {
 	// Diviser l'opcode en parties individuelles pour faciliter le décodage
@@ -103,6 +101,7 @@ func (c *Cpu) decode(opcode uint16) {
 		case 0x0008:
 			c.opFx18(opcodeX)
 		case 0x000E:
+			c.opFx1E(opcodeX)
 			// Opcode FX1E - Ajout de l'index (I)
 		case 0x0009:
 			// Opcode FX29 - Chargement de l'emplacement du caractère
