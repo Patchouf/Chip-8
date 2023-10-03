@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
 	"log"
 	"os"
@@ -53,7 +52,7 @@ func main() {
 	// fmt.Println(game.cpu.Memory)
 
 	ebiten.SetWindowSize(640, 320)
-	ebiten.SetWindowTitle("Chip8 Emulator :  " + filename[6:])
+	ebiten.SetWindowTitle("Chip8 Emulator")
 	ebiten.RunGame(&game)
 	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
@@ -71,14 +70,14 @@ func readROM(filename string) []byte {
 }
 
 // fonction pour print le rom
-func PrintROM(rom []byte) {
-	for i, byt := range rom {
-		if i%2 == 0 {
-			fmt.Printf("0x%03x: ", 0x200+i)
-		}
-		fmt.Printf("%02x", byt)
-		if i%2 == 1 {
-			fmt.Print("\n")
-		}
-	}
-}
+// func PrintROM(rom []byte) {
+// 	for i, byt := range rom {
+// 		if i%2 == 0 {
+// 			fmt.Printf("0x%03x: ", 0x200+i)
+// 		}
+// 		fmt.Printf("%02x", byt)
+// 		if i%2 == 1 {
+// 			fmt.Print("\n")
+// 		}
+// 	}
+// }
