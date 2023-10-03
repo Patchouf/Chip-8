@@ -222,6 +222,10 @@ func (c *Cpu) opBnnn(address uint16) {
 	c.Pc = address + uint16(c.Registre[0])
 }
 
+// Opcode CXNN - Génération d'un nombre aléatoire (0 à 255) =
+// Set Vx = random byte AND kk. The interpreter generates a random number from 0 to 255, which is then
+// ANDed with the value kk. The results are stored in Vx. See instruction 8xy2 for more information on AND.
+
 func (c *Cpu) opCxkk(opcodeX, opcodeNN byte) {
 	c.Registre[opcodeX] = byte(rand.Int()*256) & opcodeNN
 }
@@ -244,17 +248,23 @@ func (c *Cpu) opDxyn(opcodeX, opcodeY, opcodeN byte) {
 
 //
 
-// Opcode FX15 - Réglage du retard
+// Opcode FX15 - Réglage du retard =
+// Set delay timer = Vx. Delay Timer is set equal to the value of Vx.
+
 func (c *Cpu) opFx15(opcodeX byte) {
 	c.Delay_timer = c.Registre[opcodeX]
 }
 
-// Opcode FX07 - Chargement du retard
+// Opcode FX07 - Chargement du retard =
+// Set Vx = delay timer value. The value of DT is placed into Vx.
+
 func (c *Cpu) opFx07(opcodeX byte) {
 	c.Registre[opcodeX] = c.Delay_timer
 }
 
 // Opcode FX55 - Sauvegarde des registres
+// Stores V0 to VX in memory starting at address I. I is then set to I + x + 1.
+
 func (c *Cpu) opFx55(opcodeX byte) {
 	for i := byte(0); i <= opcodeX; i++ {
 		c.Memory[c.I+uint16(i)] = c.Registre[i]
@@ -269,7 +279,33 @@ func (c *Cpu) opFx65(opcodeX byte) {
 	}
 }
 
-//Set I = I + Vx. The values of I and Vx are added, and the results are stored in I.
+// Opcode FX18 - Réglage du son =
+// Set sound timer = Vx. Sound Timer is set equal to the value of Vx.
+
+func (c *Cpu) opFx18(opcodeX byte) {
+	c.Sound_timer = c.Registre[opcodeX]
+}
+
+// Opcode FX33 - Chargement des chiffres décimaux
+// Store BCD representation of Vx in memory locations I, I+1, and I+2. The interpreter takes the decimal
+//value of Vx, and places the hundreds digit in memory at location in I, the tens digit at location I+1, and
+// the ones digit at location I+2.
+
+func (c *Cpu) opFx33(opcodeX byte) {
+	value := c.Registre[opcodeX]
+
+	hundreds := value / 100
+	value %= 100
+	tens := value / 10
+	ones := value % 10
+
+	// Stockez les chiffres décimaux dans la mémoire à partir de l'adresse I
+	c.Memory[c.I] = hundreds
+	c.Memory[c.I+1] = tens
+	c.Memory[c.I+2] = ones
+}
+
+//Set I = I + Vx. The values of I and Vx are added, and the results are stored in I
 
 func (c *Cpu) opFx1E(opcodeX byte) {
 	c.I += uint16(c.Registre[opcodeX])

@@ -1,7 +1,5 @@
 package emulator
 
-import "math/rand"
-
 // décodage d'un opcode et exécute l'instruction correspondante.
 func (c *Cpu) decode(opcode uint16) {
 	// Diviser l'opcode en parties individuelles pour faciliter le décodage
@@ -67,10 +65,8 @@ func (c *Cpu) decode(opcode uint16) {
 	case 0xB000:
 		c.opBnnn(opcodeNNN)
 	case 0xC000:
-		// Opcode CXNN - Génération d'un nombre aléatoire (0 à 255) =
-		//Set Vx = random byte AND kk. The interpreter generates a random number from 0 to 255, which is then
-		//ANDed with the value kk. The results are stored in Vx. See instruction 8xy2 for more information on AND.
-		c.Registre[opcodeN4] = byte(rand.Int()*256) & byte(opcodeNNN)
+
+		c.opCxkk(opcodeX, opcodeNN)
 	case 0xD000:
 		c.opDxyn(opcodeX, opcodeY, opcodeN4)
 	case 0xE000:
@@ -101,14 +97,14 @@ func (c *Cpu) decode(opcode uint16) {
 				// Gérer les opcodes FX07 à FX65 ici (non standard)
 			}
 		case 0x0008:
-			// Opcode FX18 - Réglage du son
+			c.opFx18(opcodeX)
 		case 0x000E:
 			c.opFx1E(opcodeX)
 			// Opcode FX1E - Ajout de l'index (I)
 		case 0x0009:
 			// Opcode FX29 - Chargement de l'emplacement du caractère
 		case 0x0003:
-			// Opcode FX33 - Chargement des chiffres décimaux
+			c.opFx33(opcodeX)
 		default:
 			// Gérer les opcodes FX07 à FX65 ici (non standard)
 		}
