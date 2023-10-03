@@ -101,13 +101,13 @@ func (c *Cpu) decode(opcode uint16) {
 				// Gérer les opcodes FX07 à FX65 ici (non standard)
 			}
 		case 0x0008:
-			// Opcode FX18 - Réglage du son
+			c.opFx18(opcodeX)
 		case 0x000E:
 			// Opcode FX1E - Ajout de l'index (I)
 		case 0x0009:
 			// Opcode FX29 - Chargement de l'emplacement du caractère
 		case 0x0003:
-			// Opcode FX33 - Chargement des chiffres décimaux
+			c.opFx33(opcodeX)
 		default:
 			// Gérer les opcodes FX07 à FX65 ici (non standard)
 		}
