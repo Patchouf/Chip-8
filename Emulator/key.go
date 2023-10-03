@@ -32,3 +32,7 @@ type Clavier struct {
 func (clavier *Clavier) GetKey(key byte) bool {
 	return clavier.IsPressed[key]
 }
+
+func (clavier *Clavier) Update(keyIndex byte, pressed bool){
+	clavier.IsPressed[keyIndex] = pressed
+}

@@ -70,6 +70,7 @@ func (c *Cpu) decode(opcode uint16) {
 		switch opcode & 0x000F {
 		case 0x000E:
 			// Opcode EX9E - Saut si touche pressée
+			// c.opEX9E(opcodeX,clavier)
 		case 0x0001:
 			// Opcode EXA1 - Saut si touche non pressée
 		default:

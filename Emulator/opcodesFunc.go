@@ -2,7 +2,6 @@ package emulator
 
 import (
 	"math/rand"
-	"vendor/golang.org/x/net/dns/dnsmessage"
 )
 
 func (c *Cpu) StackPush(address uint16) {
@@ -313,11 +312,19 @@ func (c *Cpu) opFx1E(opcodeX byte) {
 	c.I += uint16(c.Registre[opcodeX])
 }
 
+// Opcode EX9E - Saut si touche pressée
+func (c *Cpu) opEX9E(opcodeX byte, clavier *Clavier) {
+	keyIndex := c.Registre[opcodeX]
 
-func (c *Cpu) opEX9E(opcodeX byte) {
-    keyIndex := c.Registre[opcodeX] 
-    
-    if clavier.IsPressed[keyIndex] {
-		c.Pc += 2
-	}	
+	if clavier.GetKey(keyIndex) {
+		c.op1nnn(c.Pc)
 	}
+}
+
+func (c *Cpu) opEXA1(opcodeX byte, clavier *Clavier) {
+	keyIndex := c.Registre[opcodeX]
+
+	if !clavier.GetKey(keyIndex) {
+		c.op1nnn(c.Pc)
+	}
+}
