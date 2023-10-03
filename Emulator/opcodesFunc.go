@@ -272,10 +272,12 @@ func (c *Cpu) opFx18(opcodeX byte) {
 	c.Sound_timer = c.Registre[opcodeX]
 }
 
+
 // Opcode FX33 - Chargement des chiffres décimaux
 func (c *Cpu) opFx33(opcodeX byte) {
     value := c.Registre[opcodeX]
 
+    // Obtenez les chiffres décimaux individuels
     hundreds := value / 100
     value %= 100
     tens := value / 10

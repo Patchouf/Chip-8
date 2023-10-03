@@ -70,7 +70,7 @@ func (c *Cpu) decode(opcode uint16) {
 		// Opcode CXNN - Génération d'un nombre aléatoire (0 à 255) =
 		//Set Vx = random byte AND kk. The interpreter generates a random number from 0 to 255, which is then
 		//ANDed with the value kk. The results are stored in Vx. See instruction 8xy2 for more information on AND.
-		c.Registre[opcodeN4] = byte(rand.Int()*256) & byte(opcodeNNN)
+		c.Registre[opcodeX] = byte(rand.Int()*256) & byte(opcodeNN)
 	case 0xD000:
 		c.opDxyn(opcodeX, opcodeY, opcodeN4)
 	case 0xE000:
