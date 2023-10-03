@@ -39,72 +39,63 @@ func (c *Cpu) op00EE() {
 
 }
 
-
 // Opcode 1NNN - Saut
-		// Jump to location nnn. The interpreter sets the program counter to nnn.
+// Jump to location nnn. The interpreter sets the program counter to nnn.
 func (c *Cpu) op1nnn(address uint16) {
 	c.Pc = address - 2
 }
 
-
 // Opcode 2NNN - Appel de sous-routine =
-		// Call subroutine at nnn. The interpreter increments the stack pointer, then puts the current PC on the top
-		//of the stack. The PC is then set to nnn.
+// Call subroutine at nnn. The interpreter increments the stack pointer, then puts the current PC on the top
+// of the stack. The PC is then set to nnn.
 func (c *Cpu) op2nnn(address uint16) {
 	// Vérifie que le pointeur de pile (SP) est dans la plage valide (0-15).
 	c.StackPush(c.Pc)
 	c.Pc = address - 2
 }
 
-
 // Opcode 3XNN - Saut conditionnel (égal) =
-		// Skip next instruction if Vx = kk. The interpreter compares register Vx to kk, and if they are equal,
-		//increments the program counter by 2.
+// Skip next instruction if Vx = kk. The interpreter compares register Vx to kk, and if they are equal,
+// increments the program counter by 2.
 func (c *Cpu) op3nnn(opcodeX, opcodeNNN byte) {
 	if c.Registre[opcodeX] == opcodeNNN {
 		c.Pc += 2
 	}
 }
 
-
 // Opcode 4XNN - Saut conditionnel (différent)
-		// Skip next instruction if Vx != kk. The interpreter compares register Vx to kk, and if they are not equal,
-		// increments the program counter by 2.
+// Skip next instruction if Vx != kk. The interpreter compares register Vx to kk, and if they are not equal,
+// increments the program counter by 2.
 func (c *Cpu) op4nnn(opcodeX, opcodeNN byte) {
 	if c.Registre[opcodeX] != opcodeNN {
 		c.Pc += 2
 	}
 }
 
-
 // Opcode 5XY0 - Saut conditionnel (égalité de registres)
-		// Skip next instruction if Vx = Vy. The interpreter compares register Vx to register Vy, and if they are equal,
-		// increments the program counter by 2.
+// Skip next instruction if Vx = Vy. The interpreter compares register Vx to register Vy, and if they are equal,
+// increments the program counter by 2.
 func (c *Cpu) op5nnn(opcodeX, opcodeY byte) {
 	if c.Registre[opcodeX] == c.Registre[opcodeY] {
 		c.Pc += 2
 	}
 }
 
-
-
-		// Opcode 6XNN - Chargement de valeur constante
-		// Set Vx = kk. The interpreter puts the value kk into register Vx
+// Opcode 6XNN - Chargement de valeur constante
+// Set Vx = kk. The interpreter puts the value kk into register Vx
 func (c *Cpu) op6nnn(opcodeX, opcodeNN byte) {
 	c.Registre[opcodeX] = opcodeNN
 }
 
-
 // Opcode 7XNN - Ajout de valeur constante =
-		// Set Vx = Vx + kk. Adds the value kk to the value of register Vx, then stores the result in Vx.
+// Set Vx = Vx + kk. Adds the value kk to the value of register Vx, then stores the result in Vx.
 func (c *Cpu) op7nnn(opcodeX, opcodeNN byte) {
 	c.Registre[opcodeX] = c.Registre[opcodeX] + opcodeNN
 
 }
 
-
 // Opcode 8XY0 - Copie de Registre =
-			//Set Vx = Vy. Stores the value of register Vy in register Vx.
+// Set Vx = Vy. Stores the value of register Vy in register Vx.
 func (c *Cpu) op8nn0(opcodeX, opcodeY byte) {
 	c.Registre[opcodeX] = c.Registre[opcodeY]
 
@@ -270,8 +261,16 @@ func (c *Cpu) opFx55(opcodeX byte) {
 	}
 }
 
+//Fills V0 to VX with values from memory starting at address I. I is then set to I + x + 1.
+
 func (c *Cpu) opFx65(opcodeX byte) {
 	for i := byte(0); i <= opcodeX; i++ {
 		c.Registre[i] = c.Memory[c.I+uint16(i)]
 	}
+}
+
+//Set I = I + Vx. The values of I and Vx are added, and the results are stored in I.
+
+func (c *Cpu) opFx1E(opcodeX byte) {
+	c.I += uint16(c.Registre[opcodeX])
 }

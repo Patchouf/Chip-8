@@ -103,6 +103,7 @@ func (c *Cpu) decode(opcode uint16) {
 		case 0x0008:
 			// Opcode FX18 - Réglage du son
 		case 0x000E:
+			c.opFx1E(opcodeX)
 			// Opcode FX1E - Ajout de l'index (I)
 		case 0x0009:
 			// Opcode FX29 - Chargement de l'emplacement du caractère
