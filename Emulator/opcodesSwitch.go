@@ -102,54 +102,26 @@ func (c *Cpu) decode(opcode uint16) {
 
 		case 0x0003:
 
-			// Opcode 8XY3 - Opération XOR (bitwise XOR) =
-			//Set Vx = Vx XOR Vy. Performs a bitwise exclusive OR on the values of Vx and Vy, then stores the result
-			// in Vx. An exclusive OR compares the corresponding bits from two values, and if the bits are not both the
-			// same, then the corresponding bit in the result is set to 1. Otherwise, it is 0.
+			
 
 			c.op8nn3(opcodeX, opcodeY)
 
 		case 0x0004:
-
-			// Opcode 8XY4 - Ajout avec retenue =
-			//Set Vx = Vx + Vy, set VF = carry. The values of Vx and Vy are added together. If the result is greater
-			//than 8 bits (i.e., ¿ 255,) VF is set to 1, otherwise 0. Only the lowest 8 bits of the result are kept, and stored
-			//in Vx.
-
-			//  Vx += Vy
-
 			c.op8nn4(opcodeX, opcodeY)
-
 		case 0x0005:
-
-			// Opcode 8XY5 - Soustraction avec retenue
-			// Vx -= Vy
-			//Set Vx = Vx - Vy, set VF = NOT borrow. If Vx ¿ Vy, then VF is set to 1, otherwise 0. Then Vy is
-			//subtracted from Vx, and the results stored in Vx.
-
 			c.op8nn5(opcodeX, opcodeY)
-
 		case 0x0006:
-
-			// Opcode 8XY6 - Décalage à droite
-			//Set Vx = Vx SHR 1. If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is
-			//divided 	by 2
-
 			c.op8nn6(opcodeX, opcodeY)
 
 		case 0x0007:
 
-			// Opcode 8XY7 - Soustraction inversée avec retenue =
-			//Set Vx = Vy - Vx, set VF = NOT borrow. If Vy ¿ Vx, then VF is set to 1, otherwise 0. Then Vx is
-			//subtracted from Vy, and the results stored in Vx.
+		
 
 			c.op8nn7(opcodeX, opcodeY)
 
 		case 0xE:
 
-			// Opcode 8XYE - Décalage à gauche =
-			//Set Vx = Vx SHL 1. If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is
-			//multiplied by 2
+			
 
 			c.op8nnE(opcodeX, opcodeY)
 
@@ -158,9 +130,6 @@ func (c *Cpu) decode(opcode uint16) {
 		}
 	case 0x9000:
 
-		// Opcode 9XY0 - Saut conditionnel (différents registres)=
-		//Skip next instruction if Vx != Vy. The values of Vx and Vy are compared, and if they are not equal, the
-		//program counter is increased by 2
 
 		c.op9nn0(opcodeX, opcodeY)
 
