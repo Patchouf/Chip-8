@@ -46,13 +46,13 @@ func (c *Cpu) decode(opcode uint16) {
 		case 0x0003:
 			c.op8nn3(opcodeX, opcodeY)
 		case 0x0004:
-			c.op8nn4(opcodeX, opcodeY)
+			c.op8xy4(opcodeX, opcodeY)
 		case 0x0005:
-			c.op8nn5(opcodeX, opcodeY)
+			c.op8xy5(opcodeX, opcodeY)
 		case 0x0006:
 			c.op8nn6(opcodeX, opcodeY)
 		case 0x0007:
-			c.op8nn7(opcodeX, opcodeY)
+			c.op8xy7(opcodeX, opcodeY)
 		case 0xE:
 			c.op8nnE(opcodeX, opcodeY)
 		default:
