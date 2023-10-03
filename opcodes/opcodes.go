@@ -142,6 +142,9 @@ func (cpu *Cpu) Update() {
 	opcode := cpu.uint8ToUint16(op1, op2)
 	// fmt.Printf("%02x", opcode)
 	// fmt.Println()
+	if cpu.Delay_timer > 0 {
+		cpu.Delay_timer--
+	}
 	cpu.decode(opcode)
 }
 
@@ -260,7 +263,8 @@ func (c *Cpu) decode(opcode uint16) {
 		// Opcode 2NNN - Appel de sous-routine =
 		// Call subroutine at nnn. The interpreter increments the stack pointer, then puts the current PC on the top
 		//of the stack. The PC is then set to nnn.
-		// c.op2nnn(uint16(opcodeNNN), 0x00)
+		c.op2nnn(uint16(opcodeNNN), 0x00)
+		c.StackPush(c.Pc + 2)
 
 	case 0x3000:
 
@@ -269,6 +273,7 @@ func (c *Cpu) decode(opcode uint16) {
 		//increments the program counter by 2.
 
 		c.op3nnn(opcodeX, opcodeNN)
+		c.StackPush(c.Pc + 2)
 
 	case 0x4000:
 
@@ -277,6 +282,7 @@ func (c *Cpu) decode(opcode uint16) {
 		// increments the program counter by 2.
 
 		c.op4nnn(opcodeX, opcodeNN)
+		c.StackPush(c.Pc + 2)
 
 	case 0x5000:
 
@@ -285,6 +291,7 @@ func (c *Cpu) decode(opcode uint16) {
 		// increments the program counter by 2.
 
 		c.op5nnn(opcodeX, opcodeY)
+		c.StackPush(c.Pc + 2)
 
 	case 0x6000:
 
@@ -429,18 +436,17 @@ func (c *Cpu) decode(opcode uint16) {
 	case 0xF000:
 		switch opcode & 0x000F {
 		case 0x0007:
-			// Opcode FX07 - Chargement du retard
-			c.Delay_timer = c.Registre[opcodeX]
+			c.opFx07(opcodeX)
 		case 0x000A:
 			// Opcode FX0A - Attente de touche
 		case 0x0005:
 			switch opcode & 0x00F0 {
 			case 0x0010:
-				// Opcode FX15 - Réglage du retard
+				c.opFx15(opcodeX)
 			case 0x0050:
-				// Opcode FX55 - Sauvegarde des registres
+				c.opFx55(opcodeX)
 			case 0x0060:
-				// Opcode FX65 - Chargement des registres
+				c.opFx65(opcodeX)
 			}
 
 		case 0x0008:
@@ -507,12 +513,13 @@ func (c *Cpu) op1nnn(address uint16) {
 }
 
 func (c *Cpu) op2nnn(address uint16, opcodeNNN byte) {
-	// Vérifiez que le pointeur de pile (SP) est dans la plage valide (0-15).
+	// Vérifie que le pointeur de pile (SP) est dans la plage valide (0-15).
 	c.StackPush(c.Pc)
 	c.Pc = address - 2
 }
 func (c *Cpu) StackPush(address uint16) {
-	// Vérifiez que le pointeur de pile (SP) est dans la plage valide (0-15).
+	// Vérifie que le pointeur de pile (SP) est dans la plage valide (0-15).
+	fmt.Println(c.Sp)
 	if c.Sp >= 15 {
 		return
 	}
@@ -653,6 +660,25 @@ func (c *Cpu) opCxkk(opcodeX, opcodeNN byte) {
 	c.Registre[opcodeX] = byte(rand.Int()*256) & opcodeNN
 }
 
-func (clavier *Clavier) GetKey(key byte) bool {
-	return clavier.IsPressed[key]
+// Opcode FX15 - Réglage du retard
+func (c *Cpu) opFx15(opcodeX byte) {
+	c.Delay_timer = c.Registre[opcodeX]
+}
+
+// Opcode FX07 - Chargement du retard
+func (c *Cpu) opFx07(opcodeX byte) {
+	c.Registre[opcodeX] = c.Delay_timer
+}
+
+// Opcode FX55 - Sauvegarde des registres
+func (c *Cpu) opFx55(opcodeX byte) {
+	for i := byte(0); i <= opcodeX; i++ {
+		c.Memory[c.I+uint16(i)] = c.Registre[i]
+	}
+}
+
+func (c *Cpu) opFx65(opcodeX byte) {
+	for i := byte(0); i <= opcodeX; i++ {
+		c.Registre[i] = c.Memory[c.I+uint16(i)]
+	}
 }
