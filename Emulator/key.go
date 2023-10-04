@@ -4,8 +4,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-
-func (c *Cpu) GetKey() {
+func (c *Cpu) GetKey(x byte) {
 	// test := []string{"  0  ", "  1  ", "  2  ", "  3  ", "  4  ", "  5  ", "  6  ", "  7  ", "  8  ", "  9  ", "  A  ", "  B  ", "  C  ", "  D  ", "  E  ", "  F  "}
 	c.Key = [16]bool{
 		ebiten.IsKeyPressed(ebiten.Key0), //0
@@ -29,9 +28,10 @@ func (c *Cpu) GetKey() {
 	if c.WaitForKey {
 		for i := 0; i < len(c.Key); i++ {
 			if c.Key[i] {
+				c.Registre[i] = x
+				c.Delay_timer = 0
 				c.WaitForKey = false
 			}
 		}
 	}
 }
-
