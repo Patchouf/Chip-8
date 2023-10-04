@@ -35,7 +35,6 @@ func (c *Cpu) op6XNN(opcodeX, opcodeNNN byte) {
 // then subtracts 1 from the stack pointer
 func (c *Cpu) op00EE() {
 	c.Pc = c.stackPop()
-
 }
 
 // Opcode 1NNN - Saut
@@ -90,14 +89,12 @@ func (c *Cpu) op6nnn(opcodeX, opcodeNN byte) {
 // Set Vx = Vx + kk. Adds the value kk to the value of register Vx, then stores the result in Vx.
 func (c *Cpu) op7nnn(opcodeX, opcodeNN byte) {
 	c.Registre[opcodeX] = c.Registre[opcodeX] + opcodeNN
-
 }
 
 // Opcode 8XY0 - Copie de Registre =
 // Set Vx = Vy. Stores the value of register Vy in register Vx.
 func (c *Cpu) op8nn0(opcodeX, opcodeY byte) {
 	c.Registre[opcodeX] = c.Registre[opcodeY]
-
 }
 
 // Opcode 8XY1 - Opération OU (bitwise OR) =
@@ -106,7 +103,6 @@ func (c *Cpu) op8nn0(opcodeX, opcodeY byte) {
 // result is also 1. Otherwise, it is 0.
 func (c *Cpu) op8nn1(x, y byte) {
 	c.Registre[x] |= c.Registre[y]
-
 }
 
 // Opcode 8XY2 - Opération ET (bitwise AND) =
@@ -115,7 +111,6 @@ func (c *Cpu) op8nn1(x, y byte) {
 // in the result is also 1. Otherwise, it is 0.
 func (c *Cpu) op8nn2(opcodeX, opcodeY byte) {
 	c.Registre[opcodeX] &= c.Registre[opcodeY]
-
 }
 
 // Opcode 8XY3 - Opération XOR (bitwise XOR) =
@@ -124,7 +119,6 @@ func (c *Cpu) op8nn2(opcodeX, opcodeY byte) {
 // same, then the corresponding bit in the result is set to 1. Otherwise, it is 0.
 func (c *Cpu) op8nn3(opcodeX, opcodeY byte) {
 	c.Registre[opcodeX] ^= c.Registre[opcodeY]
-
 }
 
 // Opcode 8XY4 - Ajout avec retenue =
@@ -231,7 +225,6 @@ func (c *Cpu) opBnnn(address uint16) {
 // Opcode CXNN - Génération d'un nombre aléatoire (0 à 255) =
 // Set Vx = random byte AND kk. The interpreter generates a random number from 0 to 255, which is then
 // ANDed with the value kk. The results are stored in Vx. See instruction 8xy2 for more information on AND.
-
 func (c *Cpu) opCxkk(opcodeX, opcodeNN byte) {
 	c.Registre[opcodeX] = byte(rand.Int()*256) & opcodeNN
 }
@@ -247,9 +240,7 @@ func (c *Cpu) opDxyn(opcodeX, opcodeY, opcodeN byte) {
 		if erased := c.DrawSprite(xval, yval+i, row); erased {
 			c.Registre[0xF] = 1
 		}
-
 	}
-
 }
 
 // Opcode FX15 - Réglage du retard =
@@ -291,13 +282,11 @@ func (c *Cpu) opFx18(opcodeX byte) {
 // the ones digit at location I+2.
 func (c *Cpu) opFx33(opcodeX byte) {
 	value := c.Registre[opcodeX]
-
 	// Pour obtenir les chiffres individuels
 	hundreds := value / 100
 	value %= 100
 	tens := value / 10
 	ones := value % 10
-
 	// Stock les chiffres décimaux dans la mémoire à partir de l'adresse I
 	c.Memory[c.I] = hundreds
 	c.Memory[c.I+1] = tens
@@ -321,7 +310,6 @@ func (c *Cpu) opEX9E(opcodeX byte, clavier *Clavier) {
 // Opcode EXA1 - Saut si touche non pressée
 func (c *Cpu) opEXA1(opcodeX byte, clavier *Clavier) {
 	keyIndex := c.Registre[opcodeX]
-
 	if !clavier.GetKey(keyIndex) {
 		c.op1nnn(c.Pc)
 	}

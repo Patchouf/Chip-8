@@ -103,6 +103,5 @@ func (c *Cpu) decode(opcode uint16) {
 		default:
 		}
 	default:
-
 	}
 }

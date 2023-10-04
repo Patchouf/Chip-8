@@ -165,7 +165,6 @@ func (c *Cpu) Uint8ToUint4(n uint8) (uint8, uint8) {
 func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
 	erased := false
 	yIndex := y % 32
-
 	for i := x; i < x+8; i++ {
 		xIndex := i % 64
 
@@ -178,6 +177,5 @@ func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
 			erased = true
 		}
 	}
-
 	return erased
 }
