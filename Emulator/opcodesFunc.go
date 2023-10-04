@@ -326,6 +326,7 @@ func (c *Cpu) opEXA1(opcodeX byte) {
 // value of that key is stored in Vx.
 func (c *Cpu) opFX0A(opcodeX byte) {
 	fmt.Println("opFX0A ////////////////////")
+	// fmt.Println("test")
 	c.WaitForKey = true
 	// c.Registre[opcodeX] = c.GetKey()
 }
