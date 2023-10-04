@@ -135,10 +135,14 @@ func (cpu *Cpu) Update() {
 		cpu.GetKey()
 		return
 	}
-
+	
 	cpu.GetKey()
-	// cpu.Delay_timer += 1
-	// cpu.Sound_timer -= 1
+	if cpu.Delay_timer > 0 {
+		cpu.Delay_timer--
+	}
+	if cpu.Sound_timer > 0 {
+		cpu.Sound_timer--
+	}
 	cpu.Pc += 2
 	op1 := cpu.Memory[cpu.Pc]
 	op2 := cpu.Memory[cpu.Pc+1]
