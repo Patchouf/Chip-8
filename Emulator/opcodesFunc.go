@@ -229,12 +229,13 @@ func (c *Cpu) op8xy7(opcodeX, opcodeY byte) {
 // Set Vx = Vx SHL 1. If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is
 // multiplied by 2
 func (c *Cpu) op8nnE(opcodeX, opcodeY byte) {
-	if c.Registre[opcodeX]&0x000F == 1 {
+	if (c.Registre[opcodeX] >> 7) == 1 {
 		c.Registre[0xF] = 1
 	} else {
 		c.Registre[0xF] = 0
 	}
-	c.Registre[opcodeX] *= 2
+	c.Registre[opcodeX] = c.Registre[opcodeX] * 2
+
 }
 
 // Opcode 9XY0 - Saut conditionnel (différents registres)=
@@ -328,12 +329,13 @@ func (c *Cpu) opFx18(opcodeX byte) {
 func (c *Cpu) opFx33(opcodeX byte) {
 	value := c.Registre[opcodeX]
 
+	// Pour obtenir les chiffres individuels
 	hundreds := value / 100
 	value %= 100
 	tens := value / 10
 	ones := value % 10
 
-	// Stockez les chiffres décimaux dans la mémoire à partir de l'adresse I
+	// Stock les chiffres décimaux dans la mémoire à partir de l'adresse I
 	c.Memory[c.I] = hundreds
 	c.Memory[c.I+1] = tens
 	c.Memory[c.I+2] = ones
@@ -343,4 +345,22 @@ func (c *Cpu) opFx33(opcodeX byte) {
 
 func (c *Cpu) opFx1E(opcodeX byte) {
 	c.I += uint16(c.Registre[opcodeX])
+}
+
+// Opcode EX9E - Saut si touche pressée
+func (c *Cpu) opEX9E(opcodeX byte, clavier *Clavier) {
+	keyIndex := c.Registre[opcodeX]
+
+	if clavier.GetKey(keyIndex) {
+		c.op1nnn(c.Pc)
+	}
+}
+
+// Opcode EXA1 - Saut si touche non pressée
+func (c *Cpu) opEXA1(opcodeX byte, clavier *Clavier) {
+	keyIndex := c.Registre[opcodeX]
+
+	if !clavier.GetKey(keyIndex) {
+		c.op1nnn(c.Pc)
+	}
 }
