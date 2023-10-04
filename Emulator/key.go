@@ -1,8 +1,6 @@
 package emulator
 
 import (
-	"fmt"
-
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -10,57 +8,53 @@ type Clavier struct {
 	IsPressed [16]bool
 }
 
-func RefreshKeys(chip8 *Clavier, cpu *Cpu) {
-	chip8.IsPressed = [16]bool{
+func (c *Cpu) GetKey() {
+	// test := []string{"  0  ", "  1  ", "  2  ", "  3  ", "  4  ", "  5  ", "  6  ", "  7  ", "  8  ", "  9  ", "  A  ", "  B  ", "  C  ", "  D  ", "  E  ", "  F  "}
+	c.Key = [16]bool{
+		ebiten.IsKeyPressed(ebiten.Key0), //0
 		ebiten.IsKeyPressed(ebiten.Key1), //1
-		ebiten.IsKeyPressed(ebiten.Key2), //2
+		ebiten.IsKeyPressed(ebiten.Key2), //2q
 		ebiten.IsKeyPressed(ebiten.Key3), //3
 		ebiten.IsKeyPressed(ebiten.Key4), //4
+		ebiten.IsKeyPressed(ebiten.Key5), //5
+		ebiten.IsKeyPressed(ebiten.Key6), //6
+		ebiten.IsKeyPressed(ebiten.Key7), //7
+		ebiten.IsKeyPressed(ebiten.Key8), //8
+		ebiten.IsKeyPressed(ebiten.Key9), //9
 		ebiten.IsKeyPressed(ebiten.KeyQ), //A
-		ebiten.IsKeyPressed(ebiten.KeyW), //Z
-		ebiten.IsKeyPressed(ebiten.KeyE), //E
-		ebiten.IsKeyPressed(ebiten.KeyR), //R
-		ebiten.IsKeyPressed(ebiten.KeyA), //Q
-		ebiten.IsKeyPressed(ebiten.KeyS), //S
-		ebiten.IsKeyPressed(ebiten.KeyD), //D
-		ebiten.IsKeyPressed(ebiten.KeyF), //F
-		ebiten.IsKeyPressed(ebiten.KeyZ), //W
-		ebiten.IsKeyPressed(ebiten.KeyX), //X
+		ebiten.IsKeyPressed(ebiten.KeyB), //B
 		ebiten.IsKeyPressed(ebiten.KeyC), //C
-		ebiten.IsKeyPressed(ebiten.KeyV), //V
+		ebiten.IsKeyPressed(ebiten.KeyD), //D
+		ebiten.IsKeyPressed(ebiten.KeyE), //E
+		ebiten.IsKeyPressed(ebiten.KeyF), //F
 	}
 
-	// set up tab key
-	for i := 0 ; i < len(chip8.IsPressed); i++ {
-		if chip8.IsPressed[i] {
-			cpu.Key[i] = 1
-		} else {
-			cpu.Key[i] = 0
+	if c.WaitForKey {
+		for i := 0; i < len(c.Key); i++ {
+			if c.Key[i] {
+				c.WaitForKey = false
+			}
 		}
 	}
-	fmt.Printf("%x \n", cpu.Key)
 
-	// test fonctionnement
-	// for index := 0; index < len(chip8.IsPressed); index++ {
-	// 	if chip8.IsPressed[index] {
-	// 		fmt.Println(index)
-	// 		cpu.Key[index] = 255
-	// 		for ix := range cpu.Key {
-	// 			if cpu.Key[ix] == 255 {
-	// 				fmt.Println("oura", +ix)
-	// 			}
-	// 		}
+	// fmt.Println("Ok")
+	// fmt.Println(test)
+	// fmt.Println(c.Key)
+
+	// for i:=0; i < len(c.Key); i++ {
+	// 	if c.Key[i] {
+	// 		c.WaitingForInput = false
+	// 		return uint8(uint16(i))
 	// 	}
 	// }
+	// c.WaitingForInput = false
+	// return 0
 }
 
-
-
-
-func (clavier *Clavier) GetKey(key byte) bool {
-	fmt.Println(clavier.IsPressed[key])
-	return clavier.IsPressed[key]
-}
-func (clavier *Clavier) Update(keyIndex byte, pressed bool) {
-	clavier.IsPressed[keyIndex] = pressed
-}
+// func (clavier *Clavier) GetKey(key byte) bool {
+// 	fmt.Println(clavier.IsPressed[key])
+// 	return clavier.IsPressed[key]
+// }
+// func (clavier *Clavier) Update(keyIndex byte, pressed bool) {
+// 	clavier.IsPressed[keyIndex] = pressed
+// }

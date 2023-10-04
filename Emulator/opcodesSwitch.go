@@ -2,6 +2,7 @@ package emulator
 
 // Fonction pour décoder les opcodes
 func (c *Cpu) decode(opcode uint16) {
+
 	// Diviser l'opcode en parties individuelles pour faciliter le décodage
 	opcodeX := byte(opcode>>8) & 0x000F // Bits 8 à 11
 	opcodeY := byte(opcode>>4) & 0x000F // Bits 4 à 7
@@ -68,11 +69,9 @@ func (c *Cpu) decode(opcode uint16) {
 		// Gérer les opcodes EX9E et EXA1
 		switch opcode & 0x000F {
 		case 0x000E:
-			// Opcode EX9E - Saut si touche pressée
-			// c.opEX9E(opcodeX,clavier)
+			c.opEX9E(opcodeX)
 		case 0x0001:
-			// Opcode EXA1 - Saut si touche non pressée
-			// c.opEXA1(opcodeX,clavier)
+			c.opEXA1(opcodeX)
 		default:
 		}
 	case 0xF000:
@@ -80,7 +79,7 @@ func (c *Cpu) decode(opcode uint16) {
 		case 0x0007:
 			c.opFx07(opcodeX)
 		case 0x000A:
-			// Opcode FX0A - Attente de touche
+			c.opFX0A(opcodeX)
 		case 0x0005:
 			switch opcode & 0x00F0 {
 			case 0x0010:

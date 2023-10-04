@@ -1,6 +1,7 @@
 package emulator
 
 import (
+	"fmt"
 	"math/rand"
 )
 
@@ -300,18 +301,31 @@ func (c *Cpu) opFx1E(opcodeX byte) {
 }
 
 // Opcode EX9E - Saut si touche pressée
-func (c *Cpu) opEX9E(opcodeX byte, clavier *Clavier) {
-	keyIndex := c.Registre[opcodeX]
-
-	if clavier.GetKey(keyIndex) {
-		c.op1nnn(c.Pc)
+// Skip next instruction if key with the value of Vx is pressed. Checks the keyboard, and if the key corresponding
+// to the value of Vx is currently in the down position, PC is increased by 2
+func (c *Cpu) opEX9E(opcodeX byte) {
+	key := c.Registre[opcodeX]
+	// fmt.Printf("%x \n", key)
+	if c.Key[key] {
+		c.Pc += 2
 	}
 }
 
 // Opcode EXA1 - Saut si touche non pressée
-func (c *Cpu) opEXA1(opcodeX byte, clavier *Clavier) {
-	keyIndex := c.Registre[opcodeX]
-	if !clavier.GetKey(keyIndex) {
-		c.op1nnn(c.Pc)
+// Skip next instruction if key with the value of Vx is not pressed. Checks the keyboard, and if the key
+// corresponding to the value of Vx is currently in the up position, PC is increased by 2.
+func (c *Cpu) opEXA1(opcodeX byte) {
+	key := c.Registre[opcodeX]
+	if !c.Key[key] {
+		c.Pc += 2
 	}
+}
+
+// Opcode FX0A - Attente de touche
+// Wait for a key press, store the value of the key in Vx. All execution stops until a key is pressed, then the
+// value of that key is stored in Vx.
+func (c *Cpu) opFX0A(opcodeX byte) {
+	fmt.Println("opFX0A ////////////////////")
+	c.WaitForKey = true
+	// c.Registre[opcodeX] = c.GetKey()
 }

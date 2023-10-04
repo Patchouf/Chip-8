@@ -11,7 +11,9 @@ type Cpu struct {
 	Sp          byte
 	Romlength   uint16
 	Sound_timer byte
-	Key         [16]byte
+
+	Key        [16]bool
+	WaitForKey bool
 }
 
 func (cpu *Cpu) initialiseFont() {
@@ -126,13 +128,18 @@ func InitCpu(cpu *Cpu, rombytes []byte) {
 
 // Update du cpu
 func (cpu *Cpu) Update() {
+
+	if cpu.WaitForKey {
+		return
+	}
+
+	cpu.GetKey()
 	cpu.Pc += 2
 	op1 := cpu.Memory[cpu.Pc]
 	op2 := cpu.Memory[cpu.Pc+1]
 	// fmt.Println(op1, " ", op2)
 	opcode := cpu.uint8ToUint16(op1, op2)
-	// fmt.Printf("%02x", opcode)
-	// fmt.Println()
+	// fmt.Printf("%02x \n", opcode)
 	cpu.decode(opcode)
 }
 

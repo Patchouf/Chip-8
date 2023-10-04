@@ -2,6 +2,7 @@ package main
 
 import (
 	// "fmt"
+
 	"image/color"
 	"log"
 	"os"
@@ -19,7 +20,6 @@ type Game struct {
 // update du jeu
 func (g *Game) Update() error {
 	g.cpu.Update()
-	emulator.RefreshKeys(&g.keyboard, &g.cpu)
 	time.Sleep(time.Millisecond)
 	return nil
 }
@@ -49,7 +49,7 @@ func main() {
 	filename := os.Args[1]
 	rombytes := emulator.ReadROM(filename)
 	// fmt.Println(rombytes)
-	// PrintROM(rombytes)
+	// emulator.PrintROM(rombytes)
 
 	var game Game
 	emulator.InitCpu(&game.cpu, rombytes)
