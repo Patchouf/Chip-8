@@ -245,16 +245,20 @@ func (c *Cpu) opDxyn(opcodeX, opcodeY, opcodeN byte) {
 	}
 }
 
-// Opcode FX15 - Réglage du retard =
-// Set delay timer = Vx. Delay Timer is set equal to the value of Vx.
-func (c *Cpu) opFx15(opcodeX byte) {
-	c.Delay_timer = c.Registre[opcodeX]
-}
-
 // Opcode FX07 - Chargement du retard =
 // Set Vx = delay timer value. The value of DT is placed into Vx.
 func (c *Cpu) opFx07(opcodeX byte) {
+	fmt.Println(c.Delay_timer)
 	c.Registre[opcodeX] = c.Delay_timer
+	fmt.Println(c.Delay_timer)
+}
+
+// Opcode FX15 - Réglage du retard =
+// Set delay timer = Vx. Delay Timer is set equal to the value of Vx.
+func (c *Cpu) opFx15(opcodeX byte) {
+	fmt.Println(c.Delay_timer)
+	c.Delay_timer = c.Registre[opcodeX]
+	fmt.Println(c.Delay_timer)
 }
 
 // Opcode FX55 - Sauvegarde des registres
@@ -311,7 +315,7 @@ func (c *Cpu) opFx1E(opcodeX byte) {
 // Opcode EX9E - Saut si touche pressée
 // Skip next instruction if key with the value of Vx is pressed. Checks the keyboard, and if the key corresponding
 // to the value of Vx is currently in the down position, PC is increased by 2
-func (c *Cpu) opEX9E(opcodeX byte) {
+func (c *Cpu) opEx9E(opcodeX byte) {
 	key := c.Registre[opcodeX]
 	// fmt.Printf("%x \n", key)
 	if c.Key[key] {
@@ -322,7 +326,7 @@ func (c *Cpu) opEX9E(opcodeX byte) {
 // Opcode EXA1 - Saut si touche non pressée
 // Skip next instruction if key with the value of Vx is not pressed. Checks the keyboard, and if the key
 // corresponding to the value of Vx is currently in the up position, PC is increased by 2.
-func (c *Cpu) opEXA1(opcodeX byte) {
+func (c *Cpu) opExA1(opcodeX byte) {
 	key := c.Registre[opcodeX]
 	if !c.Key[key] {
 		c.Pc += 2
@@ -332,7 +336,7 @@ func (c *Cpu) opEXA1(opcodeX byte) {
 // Opcode FX0A - Attente de touche
 // Wait for a key press, store the value of the key in Vx. All execution stops until a key is pressed, then the
 // value of that key is stored in Vx.
-func (c *Cpu) opFX0A(opcodeX byte) {
+func (c *Cpu) opFx0A(opcodeX byte) {
 	fmt.Println("opFX0A ////////////////////")
 	// fmt.Println("test")
 	c.WaitForKey = true

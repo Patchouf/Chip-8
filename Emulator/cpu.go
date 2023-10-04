@@ -122,6 +122,8 @@ func InitCpu(cpu *Cpu, rombytes []byte) {
 	cpu.initialiseFont()
 	cpu.loadROM(rombytes)
 	cpu.Pc = 0x200 - 2
+	// cpu.Delay_timer = 0
+	// cpu.Sound_timer = 0
 	// fmt.Println(cpu.Pc)
 
 }
@@ -135,6 +137,8 @@ func (cpu *Cpu) Update() {
 	}
 
 	cpu.GetKey()
+	// cpu.Delay_timer += 1
+	// cpu.Sound_timer -= 1
 	cpu.Pc += 2
 	op1 := cpu.Memory[cpu.Pc]
 	op2 := cpu.Memory[cpu.Pc+1]

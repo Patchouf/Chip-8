@@ -68,35 +68,31 @@ func (c *Cpu) decode(opcode uint16) {
 	case 0xE000:
 		switch opcode & 0x000F {
 		case 0x000E:
-			c.opEX9E(opcodeX)
+			c.opEx9E(opcodeX)
 		case 0x0001:
-			c.opEXA1(opcodeX)
+			c.opExA1(opcodeX)
 		default:
 		}
 	case 0xF000:
-		switch opcode & 0x000F {
-		case 0x0007:
+		switch opcodeNNN & 0xFF {
+		case 0x07:
 			c.opFx07(opcodeX)
-		case 0x000A:
-			c.opFX0A(opcodeX)
-		case 0x0005:
-			switch opcode & 0x00F0 {
-			case 0x0010:
-				c.opFx15(opcodeX)
-			case 0x0050:
-				c.opFx55(opcodeX)
-			case 0x0060:
-				c.opFx65(opcodeX)
-			default:
-			}
-		case 0x0008:
+		case 0x0A:
+			c.opFx0A(opcodeX)
+		case 0x15:
+			c.opFx15(opcodeX)
+		case 0x18:
 			c.opFx18(opcodeX)
-		case 0x000E:
+		case 0x1E:
 			c.opFx1E(opcodeX)
-		case 0x0009:
-			c.opFx29(opcodeX) 
-		case 0x0003:
+		case 0x29:
+			c.opFx29(opcodeX)
+		case 0x33:
 			c.opFx33(opcodeX)
+		case 0x55:
+			c.opFx55(opcodeX)
+		case 0x65:
+			c.opFx65(opcodeX)
 		default:
 		}
 	default:
