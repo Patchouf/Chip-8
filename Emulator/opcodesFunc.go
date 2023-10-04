@@ -184,7 +184,7 @@ func (c *Cpu) op8xy6(opcodeX, opcodeY byte) {
 	if opcodeX != 0xF {
 		c.Registre[opcodeX] = c.Registre[opcodeX] / 2
 	}
-	c.Registre[opcodeX]++
+	// c.Registre[opcodeX]++
 }
 
 // Opcode 8XY7 - Soustraction inversée avec retenue =
@@ -211,7 +211,7 @@ func (c *Cpu) op8xyE(opcodeX, opcodeY byte) {
 	if opcodeX != 0xF {
 		c.Registre[opcodeX] = c.Registre[opcodeX] * 2
 	}
-	c.Registre[opcodeX]++
+	// c.Registre[opcodeX]++
 }
 
 // Opcode 9XY0 - Saut conditionnel (différents registres)=
