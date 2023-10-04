@@ -265,6 +265,14 @@ func (c *Cpu) opFx55(opcodeX byte) {
 	}
 }
 
+// Opcode FX29 - Chargement de l'emplacement du caractère
+// Set I = location of sprite for digit Vx. The value of I is set to the location for the hexadecimal sprite
+// corresponding to the value of Vx. See section 2.4, Display, for more information on the Chip-8 hexadecimal
+// font. To obtain this value, multiply VX by 5 (all font data stored in first 80 bytes of memory).
+func (c *Cpu) opFx29(opcodeX byte) {
+	c.I = uint16(c.Registre[opcodeX])* uint16(5)
+}
+
 // Fills V0 to VX with values from memory starting at address I. I is then set to I + x + 1.
 func (c *Cpu) opFx65(opcodeX byte) {
 	for i := byte(0); i <= opcodeX; i++ {

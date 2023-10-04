@@ -94,7 +94,7 @@ func (c *Cpu) decode(opcode uint16) {
 		case 0x000E:
 			c.opFx1E(opcodeX)
 		case 0x0009:
-			// Opcode FX29 - Chargement de l'emplacement du caractère
+			c.opFx29(opcodeX) 
 		case 0x0003:
 			c.opFx33(opcodeX)
 		default:
