@@ -6,7 +6,7 @@ import (
 	"image/color"
 	"log"
 	"os"
-	"time"
+	// "time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"main.go/emulator"
@@ -14,13 +14,11 @@ import (
 
 type Game struct {
 	cpu      emulator.Cpu
-	keyboard emulator.Clavier
 }
 
 // update du jeu
 func (g *Game) Update() error {
 	g.cpu.Update()
-	time.Sleep(time.Millisecond)
 	return nil
 }
 
@@ -44,7 +42,6 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 // fonction pour start la game, ouverture du screen
-
 func main() {
 	filename := os.Args[1]
 	rombytes := emulator.ReadROM(filename)

@@ -4,9 +4,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type Clavier struct {
-	IsPressed [16]bool
-}
 
 func (c *Cpu) GetKey() {
 	// test := []string{"  0  ", "  1  ", "  2  ", "  3  ", "  4  ", "  5  ", "  6  ", "  7  ", "  8  ", "  9  ", "  A  ", "  B  ", "  C  ", "  D  ", "  E  ", "  F  "}
@@ -36,25 +33,5 @@ func (c *Cpu) GetKey() {
 			}
 		}
 	}
-
-	// fmt.Println("Ok")
-	// fmt.Println(test)
-	// fmt.Println(c.Key)
-
-	// for i:=0; i < len(c.Key); i++ {
-	// 	if c.Key[i] {
-	// 		c.WaitingForInput = false
-	// 		return uint8(uint16(i))
-	// 	}
-	// }
-	// c.WaitingForInput = false
-	// return 0
 }
 
-// func (clavier *Clavier) GetKey(key byte) bool {
-// 	fmt.Println(clavier.IsPressed[key])
-// 	return clavier.IsPressed[key]
-// }
-// func (clavier *Clavier) Update(keyIndex byte, pressed bool) {
-// 	clavier.IsPressed[keyIndex] = pressed
-// }

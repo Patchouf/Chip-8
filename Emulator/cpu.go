@@ -122,10 +122,6 @@ func InitCpu(cpu *Cpu, rombytes []byte) {
 	cpu.initialiseFont()
 	cpu.loadROM(rombytes)
 	cpu.Pc = 0x200 - 2
-	// cpu.Delay_timer = 0
-	// cpu.Sound_timer = 0
-	// fmt.Println(cpu.Pc)
-
 }
 
 // Update du cpu
@@ -135,7 +131,7 @@ func (cpu *Cpu) Update() {
 		cpu.GetKey()
 		return
 	}
-	
+
 	cpu.GetKey()
 	if cpu.Delay_timer > 0 {
 		cpu.Delay_timer--
@@ -159,8 +155,6 @@ func (cpu *Cpu) loadROM(rombytes []byte) {
 		cpu.Memory[0x200+i] = byt
 	}
 }
-
-// Fonction stackPush
 
 // Fonction uint16 to uint8
 func (c *Cpu) Uint16ToUint8(n uint16) (uint8, uint8) {
