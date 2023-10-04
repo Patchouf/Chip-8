@@ -229,12 +229,13 @@ func (c *Cpu) op8xy7(opcodeX, opcodeY byte) {
 // Set Vx = Vx SHL 1. If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is
 // multiplied by 2
 func (c *Cpu) op8nnE(opcodeX, opcodeY byte) {
-	if c.Registre[opcodeX]&0x000F == 1 {
+	if (c.Registre[opcodeX] >> 7) == 1 {
 		c.Registre[0xF] = 1
 	} else {
 		c.Registre[0xF] = 0
 	}
-	c.Registre[opcodeX] *= 2
+	c.Registre[opcodeX] = c.Registre[opcodeX] * 2
+
 }
 
 // Opcode 9XY0 - Saut conditionnel (différents registres)=
