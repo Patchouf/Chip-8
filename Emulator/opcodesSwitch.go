@@ -19,7 +19,7 @@ func (c *Cpu) decode(opcode uint16) {
 		default:
 		}
 	case 0x1000:
-		c.op1nnn(uint16(opcodeNNN)) // PTET ERREUR = opcodeN a la place
+		c.op1nnn(uint16(opcodeNNN))
 	case 0x2000:
 		c.op2nnn(uint16(opcodeNNN))
 	case 0x3000:
@@ -33,7 +33,6 @@ func (c *Cpu) decode(opcode uint16) {
 	case 0x7000:
 		c.op7nnn(opcodeX, opcodeNN)
 	case 0x8000:
-		// Gérer les opcodes 8XY0 à 8XYE
 		switch opcode & 0x000F {
 		case 0x0000:
 			c.op8nn0(opcodeX, opcodeY)
