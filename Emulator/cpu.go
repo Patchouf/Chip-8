@@ -9,9 +9,9 @@ type Cpu struct {
 	Delay_timer byte
 	Stack       [16]uint16
 	Sp          byte
-	Key         [16]byte
 	Romlength   uint16
 	Sound_timer byte
+	Key         [16]byte
 }
 
 func (cpu *Cpu) initialiseFont() {

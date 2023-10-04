@@ -9,7 +9,8 @@ func (c *Cpu) StackPush(address uint16) {
 	c.Stack[c.Sp] = address
 	c.Sp++
 }
-func (c *Cpu) stackPop() uint16 {
+
+func (c *Cpu) StackPop() uint16 {
 	c.Sp--
 	address := c.Stack[c.Sp]
 	return address
@@ -34,7 +35,7 @@ func (c *Cpu) op6XNN(opcodeX, opcodeNNN byte) {
 // Return from a subroutine.The interpreter sets the program counter to the address at the top of the stack,
 // then subtracts 1 from the stack pointer
 func (c *Cpu) op00EE() {
-	c.Pc = c.stackPop()
+	c.Pc = c.StackPop()
 }
 
 // Opcode 1NNN - Saut
@@ -263,7 +264,7 @@ func (c *Cpu) opFx55(opcodeX byte) {
 	}
 }
 
-//Fills V0 to VX with values from memory starting at address I. I is then set to I + x + 1.
+// Fills V0 to VX with values from memory starting at address I. I is then set to I + x + 1.
 func (c *Cpu) opFx65(opcodeX byte) {
 	for i := byte(0); i <= opcodeX; i++ {
 		c.Registre[i] = c.Memory[c.I+uint16(i)]
@@ -278,7 +279,7 @@ func (c *Cpu) opFx18(opcodeX byte) {
 
 // Opcode FX33 - Chargement des chiffres décimaux
 // Store BCD representation of Vx in memory locations I, I+1, and I+2. The interpreter takes the decimal
-//value of Vx, and places the hundreds digit in memory at location in I, the tens digit at location I+1, and
+// value of Vx, and places the hundreds digit in memory at location in I, the tens digit at location I+1, and
 // the ones digit at location I+2.
 func (c *Cpu) opFx33(opcodeX byte) {
 	value := c.Registre[opcodeX]
@@ -293,7 +294,7 @@ func (c *Cpu) opFx33(opcodeX byte) {
 	c.Memory[c.I+2] = ones
 }
 
-//Set I = I + Vx. The values of I and Vx are added, and the results are stored in I
+// Set I = I + Vx. The values of I and Vx are added, and the results are stored in I
 func (c *Cpu) opFx1E(opcodeX byte) {
 	c.I += uint16(c.Registre[opcodeX])
 }

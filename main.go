@@ -1,6 +1,7 @@
 package main
 
 import (
+	// "fmt"
 	"image/color"
 	"log"
 	"os"
@@ -11,12 +12,14 @@ import (
 )
 
 type Game struct {
-	cpu emulator.Cpu
+	cpu      emulator.Cpu
+	keyboard emulator.Clavier
 }
 
 // update du jeu
 func (g *Game) Update() error {
 	g.cpu.Update()
+	emulator.RefreshKeys(&g.keyboard, &g.cpu)
 	time.Sleep(time.Millisecond)
 	return nil
 }
