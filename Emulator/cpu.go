@@ -130,6 +130,7 @@ func InitCpu(cpu *Cpu, rombytes []byte) {
 func (cpu *Cpu) Update() {
 
 	if cpu.WaitForKey {
+		cpu.GetKey()
 		return
 	}
 

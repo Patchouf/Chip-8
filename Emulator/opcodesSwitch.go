@@ -66,7 +66,6 @@ func (c *Cpu) decode(opcode uint16) {
 	case 0xD000:
 		c.opDxyn(opcodeX, opcodeY, opcodeN4)
 	case 0xE000:
-		// Gérer les opcodes EX9E et EXA1
 		switch opcode & 0x000F {
 		case 0x000E:
 			c.opEX9E(opcodeX)

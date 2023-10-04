@@ -13,7 +13,7 @@ func (c *Cpu) GetKey() {
 	c.Key = [16]bool{
 		ebiten.IsKeyPressed(ebiten.Key0), //0
 		ebiten.IsKeyPressed(ebiten.Key1), //1
-		ebiten.IsKeyPressed(ebiten.Key2), //2q
+		ebiten.IsKeyPressed(ebiten.Key2), //2
 		ebiten.IsKeyPressed(ebiten.Key3), //3
 		ebiten.IsKeyPressed(ebiten.Key4), //4
 		ebiten.IsKeyPressed(ebiten.Key5), //5
