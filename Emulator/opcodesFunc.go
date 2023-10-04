@@ -22,6 +22,12 @@ func (c *Cpu) StackPop() uint16 {
 func (c *Cpu) op00E0() {
 	for x := 0; x < 64; x++ {
 		for y := 0; y < 32; y++ {
+
+			if x > 64 || y > 31 {
+				x = x % 64
+				y = y % 32
+
+			}
 			c.Gfx[x][y] = 0
 		}
 	}
@@ -103,24 +109,27 @@ func (c *Cpu) op8nn0(opcodeX, opcodeY byte) {
 // Set Vx = Vx OR Vy. Performs a bitwise OR on the values of Vx and Vy, then stores the result in Vx. A
 // bit wise OR compares the corresponding bits from two values, and if either bit is 1, then the same bit in the
 // result is also 1. Otherwise, it is 0.
-func (c *Cpu) op8nn1(x, y byte) {
+func (c *Cpu) op8xy1(x, y byte) {
 	c.Registre[x] |= c.Registre[y]
+	c.Registre[0xF] = 0
 }
 
 // Opcode 8XY2 - Opération ET (bitwise AND) =
 // Set Vx = Vx AND Vy. Performs a bitwise AND on the values of Vx and Vy, then stores the result in Vx.
 // A bitwise AND compares the corresponding bits from two values, and if both bits are 1, then the same bit
 // in the result is also 1. Otherwise, it is 0.
-func (c *Cpu) op8nn2(opcodeX, opcodeY byte) {
+func (c *Cpu) op8xy2(opcodeX, opcodeY byte) {
 	c.Registre[opcodeX] &= c.Registre[opcodeY]
+	c.Registre[0xF] = 0
 }
 
 // Opcode 8XY3 - Opération XOR (bitwise XOR) =
 // Set Vx = Vx XOR Vy. Performs a bitwise exclusive OR on the values of Vx and Vy, then stores the result
 // in Vx. An exclusive OR compares the corresponding bits from two values, and if the bits are not both the
 // same, then the corresponding bit in the result is set to 1. Otherwise, it is 0.
-func (c *Cpu) op8nn3(opcodeX, opcodeY byte) {
+func (c *Cpu) op8xy3(opcodeX, opcodeY byte) {
 	c.Registre[opcodeX] ^= c.Registre[opcodeY]
+	c.Registre[0xF] = 0
 }
 
 // Opcode 8XY4 - Ajout avec retenue =
@@ -166,8 +175,8 @@ func (c *Cpu) op8xy5(opcodeX, opcodeY byte) {
 // Opcode 8XY6 - Décalage à droite
 // Set Vx = Vx SHR 1. If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is
 // divided 	by 2
-func (c *Cpu) op8nn6(opcodeX, opcodeY byte) {
-	if c.Registre[opcodeX]%2 == 1 {
+func (c *Cpu) op8xy6(opcodeX, opcodeY byte) {
+	if c.Registre[opcodeY]%2 == 1 {
 		c.Registre[0xF] = 1
 	} else {
 		c.Registre[0xF] = 0
@@ -175,6 +184,7 @@ func (c *Cpu) op8nn6(opcodeX, opcodeY byte) {
 	if opcodeX != 0xF {
 		c.Registre[opcodeX] = c.Registre[opcodeX] / 2
 	}
+	c.Registre[opcodeX]++
 }
 
 // Opcode 8XY7 - Soustraction inversée avec retenue =
@@ -192,8 +202,8 @@ func (c *Cpu) op8xy7(opcodeX, opcodeY byte) {
 // Opcode 8XYE - Décalage à gauche =
 // Set Vx = Vx SHL 1. If the most-significant bit of Vx is 1, then VF is set to 1, otherwise to 0. Then Vx is
 // multiplied by 2
-func (c *Cpu) op8nnE(opcodeX, opcodeY byte) {
-	if (c.Registre[opcodeX] >> 7) == 1 {
+func (c *Cpu) op8xyE(opcodeX, opcodeY byte) {
+	if (c.Registre[opcodeY] >> 7) == 1 {
 		c.Registre[0xF] = 1
 	} else {
 		c.Registre[0xF] = 0
@@ -201,6 +211,7 @@ func (c *Cpu) op8nnE(opcodeX, opcodeY byte) {
 	if opcodeX != 0xF {
 		c.Registre[opcodeX] = c.Registre[opcodeX] * 2
 	}
+	c.Registre[opcodeX]++
 }
 
 // Opcode 9XY0 - Saut conditionnel (différents registres)=
@@ -221,7 +232,7 @@ func (c *Cpu) opAnnn(address uint16) { // verifier si nnn = opcodennn ou 0
 // Opcode BNNN - Saut avec offset =
 // Jump to location nnn + V0. The program counter is set to nnn plus the value of V0
 func (c *Cpu) opBnnn(address uint16) {
-	c.Pc = address + uint16(c.Registre[0])
+	c.Pc = address + uint16(c.Registre[4])
 }
 
 // Opcode CXNN - Génération d'un nombre aléatoire (0 à 255) =
@@ -267,6 +278,8 @@ func (c *Cpu) opFx55(opcodeX byte) {
 	for i := byte(0); i <= opcodeX; i++ {
 		c.Memory[c.I+uint16(i)] = c.Registre[i]
 	}
+	c.I++
+
 }
 
 // Opcode FX29 - Chargement de l'emplacement du caractère
@@ -274,7 +287,7 @@ func (c *Cpu) opFx55(opcodeX byte) {
 // corresponding to the value of Vx. See section 2.4, Display, for more information on the Chip-8 hexadecimal
 // font. To obtain this value, multiply VX by 5 (all font data stored in first 80 bytes of memory).
 func (c *Cpu) opFx29(opcodeX byte) {
-	c.I = uint16(c.Registre[opcodeX])* uint16(5)
+	c.I = uint16(c.Registre[opcodeX]) * uint16(5)
 }
 
 // Fills V0 to VX with values from memory starting at address I. I is then set to I + x + 1.
@@ -282,6 +295,7 @@ func (c *Cpu) opFx65(opcodeX byte) {
 	for i := byte(0); i <= opcodeX; i++ {
 		c.Registre[i] = c.Memory[c.I+uint16(i)]
 	}
+	c.I++
 }
 
 // Opcode FX18 - Réglage du son =
@@ -334,11 +348,10 @@ func (c *Cpu) opExA1(opcodeX byte) {
 }
 
 // Opcode FX0A - Attente de touche
-// Wait for a key press, store the value of the key in Vx. All execution stops until a key is pressed, then the
 // value of that key is stored in Vx.
-func (c *Cpu) opFx0A(opcodeX byte) {
-	fmt.Println("opFX0A ////////////////////")
+func (c *Cpu) opFx0A(opodeX byte) {
+	fmt.Println("opFX0A///////////////////")
 	// fmt.Println("test")
 	c.WaitForKey = true
-	// c.Registre[opcodeX] = c.GetKey()
+	// c.Registre[opcodX] = c.GetKey()
 }

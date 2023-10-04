@@ -38,21 +38,21 @@ func (c *Cpu) decode(opcode uint16) {
 		case 0x0000:
 			c.op8nn0(opcodeX, opcodeY)
 		case 0x0001:
-			c.op8nn1(opcodeX, opcodeY)
+			c.op8xy1(opcodeX, opcodeY)
 		case 0x0002:
-			c.op8nn2(opcodeX, opcodeY)
+			c.op8xy2(opcodeX, opcodeY)
 		case 0x0003:
-			c.op8nn3(opcodeX, opcodeY)
+			c.op8xy3(opcodeX, opcodeY)
 		case 0x0004:
 			c.op8xy4(opcodeX, opcodeY)
 		case 0x0005:
 			c.op8xy5(opcodeX, opcodeY)
 		case 0x0006:
-			c.op8nn6(opcodeX, opcodeY)
+			c.op8xy6(opcodeX, opcodeY)
 		case 0x0007:
 			c.op8xy7(opcodeX, opcodeY)
 		case 0xE:
-			c.op8nnE(opcodeX, opcodeY)
+			c.op8xyE(opcodeX, opcodeY)
 		default:
 		}
 	case 0x9000:
