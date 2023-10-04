@@ -1,7 +1,6 @@
 package emulator
 
 import (
-	"fmt"
 	"math/rand"
 )
 
@@ -13,7 +12,6 @@ func (c *Cpu) StackPush(address uint16) {
 func (c *Cpu) stackPop() uint16 {
 	c.Sp--
 	address := c.Stack[c.Sp]
-
 	return address
 }
 
@@ -149,13 +147,6 @@ func (c *Cpu) op8xy4(opcodeX, opcodeY byte) {
 	if opcodeX != 0xF {
 		c.Registre[opcodeX] = byte(final)
 	}
-	// if final > 255 {
-	// 	c.Registre[0xF] = 1
-	// 	c.Registre[x] = 255
-	// } else {
-	// 	c.Registre[0xF] = 0
-	// 	c.Registre[x] = final
-	// }
 }
 
 // Opcode 8XY5 - Soustraction avec retenue
@@ -163,66 +154,43 @@ func (c *Cpu) op8xy4(opcodeX, opcodeY byte) {
 // Set Vx = Vx - Vy, set VF = NOT borrow. If Vx ¿ Vy, then VF is set to 1, otherwise 0. Then Vy is
 // subtracted from Vx, and the results stored in Vx.
 func (c *Cpu) op8xy5(opcodeX, opcodeY byte) {
-	// var noused byte
-	// if c.Registre[opcodeX] > c.Registre[opcodeY] {
-	// 	noused = 1
-	// }
-	// c.Registre[0xF] = noused
-	// c.Registre[opcodeX] = c.Registre[opcodeX] - c.Registre[opcodeY]
-	// if c.Registre[opcodeX] > c.Registre[opcodeY] || c.Registre[opcodeX] == c.Registre[opcodeY] {
-	// 	c.Registre[0xF] = 0
-	// } else {
-	// 	c.Registre[0xF] = 1
-	// }
-	c.Registre[opcodeX] = c.Registre[opcodeX] - c.Registre[opcodeY]
-	if c.Registre[opcodeY] > c.Registre[opcodeX] || c.Registre[opcodeX] == c.Registre[opcodeY] {
-		c.Registre[0xF] = 1
-	} else {
+	var X = int16(c.Registre[opcodeX])
+	var Y = int16(c.Registre[opcodeY])
+	res := X - Y
+	if res < 0 {
 		c.Registre[0xF] = 0
+	} else {
+		c.Registre[0xF] = 1
 	}
-	// c.Registre[opcodeX] -= c.Registre[opcodeY]
+	if opcodeX != 0xF {
+		c.Registre[opcodeX] = byte(res)
+	}
 }
 
 // Opcode 8XY6 - Décalage à droite
 // Set Vx = Vx SHR 1. If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is
 // divided 	by 2
 func (c *Cpu) op8nn6(opcodeX, opcodeY byte) {
-	// c.Registre[opcodeX] = c.Registre[opcodeX] >> 1
-	// 	if c.Registre[opcodeX]&0xFF == 1 {
-	// 		c.Registre[0xF] = 1
-	// 	} else {
-	// 		c.Registre[0xF] = 0
-	// 	}
-
-	// 	c.Registre[opcodeX] >>= 1
-	// }
-
 	if c.Registre[opcodeX]%2 == 1 {
-
 		c.Registre[0xF] = 1
 	} else {
-
 		c.Registre[0xF] = 0
 	}
-	c.Registre[opcodeX] = c.Registre[opcodeX] / 2
-
-	fmt.Println("test", c.Registre[opcodeX])
-
+	if opcodeX != 0xF {
+		c.Registre[opcodeX] = c.Registre[opcodeX] / 2
+	}
 }
 
 // Opcode 8XY7 - Soustraction inversée avec retenue =
 // Set Vx = Vy - Vx, set VF = NOT borrow. If Vy ¿ Vx, then VF is set to 1, otherwise 0. Then Vx is
 // subtracted from Vy, and the results stored in Vx.
 func (c *Cpu) op8xy7(opcodeX, opcodeY byte) {
-	// for c.Registre[opcodeY] != c.Registre[opcodeX] {
 	c.Registre[opcodeX] = c.Registre[opcodeY] - c.Registre[opcodeX]
 	if c.Registre[opcodeY] >= c.Registre[opcodeX] {
 		c.Registre[0xF] = 1
 	} else {
 		c.Registre[0xF] = 0
 	}
-	// c.Registre[opcodeX] = c.Registre[opcodeY] - c.Registre[opcodeX]
-	// }
 }
 
 // Opcode 8XYE - Décalage à gauche =
@@ -234,8 +202,9 @@ func (c *Cpu) op8nnE(opcodeX, opcodeY byte) {
 	} else {
 		c.Registre[0xF] = 0
 	}
-	c.Registre[opcodeX] = c.Registre[opcodeX] * 2
-
+	if opcodeX != 0xF {
+		c.Registre[opcodeX] = c.Registre[opcodeX] * 2
+	}
 }
 
 // Opcode 9XY0 - Saut conditionnel (différents registres)=
@@ -285,21 +254,18 @@ func (c *Cpu) opDxyn(opcodeX, opcodeY, opcodeN byte) {
 
 // Opcode FX15 - Réglage du retard =
 // Set delay timer = Vx. Delay Timer is set equal to the value of Vx.
-
 func (c *Cpu) opFx15(opcodeX byte) {
 	c.Delay_timer = c.Registre[opcodeX]
 }
 
 // Opcode FX07 - Chargement du retard =
 // Set Vx = delay timer value. The value of DT is placed into Vx.
-
 func (c *Cpu) opFx07(opcodeX byte) {
 	c.Registre[opcodeX] = c.Delay_timer
 }
 
 // Opcode FX55 - Sauvegarde des registres
 // Stores V0 to VX in memory starting at address I. I is then set to I + x + 1.
-
 func (c *Cpu) opFx55(opcodeX byte) {
 	for i := byte(0); i <= opcodeX; i++ {
 		c.Memory[c.I+uint16(i)] = c.Registre[i]
@@ -307,7 +273,6 @@ func (c *Cpu) opFx55(opcodeX byte) {
 }
 
 //Fills V0 to VX with values from memory starting at address I. I is then set to I + x + 1.
-
 func (c *Cpu) opFx65(opcodeX byte) {
 	for i := byte(0); i <= opcodeX; i++ {
 		c.Registre[i] = c.Memory[c.I+uint16(i)]
@@ -316,7 +281,6 @@ func (c *Cpu) opFx65(opcodeX byte) {
 
 // Opcode FX18 - Réglage du son =
 // Set sound timer = Vx. Sound Timer is set equal to the value of Vx.
-
 func (c *Cpu) opFx18(opcodeX byte) {
 	c.Sound_timer = c.Registre[opcodeX]
 }
@@ -325,7 +289,6 @@ func (c *Cpu) opFx18(opcodeX byte) {
 // Store BCD representation of Vx in memory locations I, I+1, and I+2. The interpreter takes the decimal
 //value of Vx, and places the hundreds digit in memory at location in I, the tens digit at location I+1, and
 // the ones digit at location I+2.
-
 func (c *Cpu) opFx33(opcodeX byte) {
 	value := c.Registre[opcodeX]
 
@@ -342,7 +305,6 @@ func (c *Cpu) opFx33(opcodeX byte) {
 }
 
 //Set I = I + Vx. The values of I and Vx are added, and the results are stored in I
-
 func (c *Cpu) opFx1E(opcodeX byte) {
 	c.I += uint16(c.Registre[opcodeX])
 }
