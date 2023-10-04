@@ -349,9 +349,9 @@ func (c *Cpu) opExA1(opcodeX byte) {
 
 // Opcode FX0A - Attente de touche
 // value of that key is stored in Vx.
-func (c *Cpu) opFx0A(opodeX byte) {
+func (c *Cpu) opFx0A(opcodeX byte) {
 	fmt.Println("opFX0A///////////////////")
 	// fmt.Println("test")
 	c.WaitForKey = true
-	// c.Registre[opcodX] = c.GetKey()
+	// c.Registre[opcodeX] = c.GetKey()
 }
