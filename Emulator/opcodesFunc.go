@@ -347,11 +347,11 @@ func (c *Cpu) opExA1(opcodeX byte) {
 	}
 }
 
-// Opcode FX0A - Attente de touche
+// Opcode FX0A - Attente de touche 
+// Wait for a key press, store the value of the key in Vx. All execution stops until a key is pressed, then the
 // value of that key is stored in Vx.
+// Pour stopper l'execution, on a réinitialiser la variable Delay_timer (à 10) dans la fonction c.GetKey(byte).
 func (c *Cpu) opFx0A(opcodeX byte) {
-	fmt.Println("opFX0A///////////////////")
-	// fmt.Println("test")
+	fmt.Println("opFX0A -------------------------")
 	c.WaitForKey = true
-	// c.Registre[opcodeX] = c.GetKey()
 }
