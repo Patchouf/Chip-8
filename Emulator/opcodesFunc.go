@@ -1,7 +1,6 @@
 package emulator
 
 import (
-	"fmt"
 	"math/rand"
 )
 
@@ -176,13 +175,14 @@ func (c *Cpu) op8xy5(opcodeX, opcodeY byte) {
 // Set Vx = Vx SHR 1. If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is
 // divided 	by 2
 func (c *Cpu) op8xy6(opcodeX, opcodeY byte) {
-	if c.Registre[opcodeY]%2 == 1 {
+	if (c.Registre[opcodeY]<< 7) == 1 {
 		c.Registre[0xF] = 1
 	} else {
 		c.Registre[0xF] = 0
 	}
 	if opcodeX != 0xF {
-		c.Registre[opcodeX] = c.Registre[opcodeX] / 2
+		// c.Registre[opcodeX] = c.Registre[opcodeX] / 2
+		c.Registre[opcodeX] = c.Registre[opcodeY] / 2
 	}
 	// c.Registre[opcodeX]++
 }
@@ -209,7 +209,8 @@ func (c *Cpu) op8xyE(opcodeX, opcodeY byte) {
 		c.Registre[0xF] = 0
 	}
 	if opcodeX != 0xF {
-		c.Registre[opcodeX] = c.Registre[opcodeX] * 2
+		// c.Registre[opcodeX] = c.Registre[opcodeX] * 2
+		c.Registre[opcodeX] = c.Registre[opcodeY] * 2
 	}
 	// c.Registre[opcodeX]++
 }
@@ -346,7 +347,6 @@ func (c *Cpu) opExA1(opcodeX byte) {
 // Wait for a key press, store the value of the key in Vx. All execution stops until a key is pressed, then the
 // value of that key is stored in Vx.
 func (c *Cpu) opFx0A(opcodeX byte) {
-	fmt.Println("Wait for a key press")
 	c.WaitForKey = true
 	c.GetKey()
 	for i := 0; i < len(c.Key); i++ {

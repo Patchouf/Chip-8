@@ -1,7 +1,7 @@
 package emulator
 
 // Fonction pour décoder les opcodes
-func (c *Cpu) decode(opcode uint16) {
+func (c *Cpu) Decode(opcode uint16) {
 
 	// Diviser l'opcode en parties individuelles pour faciliter le décodage
 	opcodeX := byte(opcode>>8) & 0x000F // Bits 8 à 11

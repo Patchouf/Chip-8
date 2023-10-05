@@ -127,19 +127,13 @@ func InitCpu(cpu *Cpu, rombytes []byte) {
 // Update du cpu
 func (cpu *Cpu) Update() {
 	cpu.GetKey()// recupere la touche pressée (si il y en a une)
-	if cpu.Delay_timer > 0 {
-		cpu.Delay_timer--
-	}
-	if cpu.Sound_timer > 0 {
-		cpu.Sound_timer--
-	}
 	cpu.Pc += 2
 	op1 := cpu.Memory[cpu.Pc]
 	op2 := cpu.Memory[cpu.Pc+1]
 	// fmt.Println(op1, " ", op2)
 	opcode := cpu.uint8ToUint16(op1, op2)
 	// fmt.Printf("%02x \n", opcode)
-	cpu.decode(opcode)
+	cpu.Decode(opcode)
 }
 
 // chargement du rom

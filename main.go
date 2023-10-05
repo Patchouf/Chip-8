@@ -9,7 +9,7 @@ import (
 	// "time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"main.go/emulator"
+	"main/emulator"
 )
 
 type Game struct {
@@ -18,6 +18,12 @@ type Game struct {
 
 // update du jeu
 func (g *Game) Update() error {
+	if g.cpu.Delay_timer > 0 {
+		g.cpu.Delay_timer--
+	}
+	if g.cpu.Sound_timer > 0 {
+		g.cpu.Sound_timer--
+	}
 	g.cpu.Update()
 	return nil
 }
@@ -45,6 +51,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 func main() {
 	filename := os.Args[1]
 	rombytes := emulator.ReadROM(filename)
+	ebiten.SetTPS(800)
 	// fmt.Println(rombytes)
 	// emulator.PrintROM(rombytes)
 
