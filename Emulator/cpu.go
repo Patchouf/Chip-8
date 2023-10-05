@@ -1,7 +1,5 @@
 package emulator
 
-import "fmt"
-
 type Cpu struct {
 	Memory      [4096]byte
 	Registre    [16]byte
