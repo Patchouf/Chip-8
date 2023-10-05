@@ -50,7 +50,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 func main() {
 	filename := os.Args[1]
 	rombytes := emulator.ReadROM(filename)
-	ebiten.SetTPS(800)
+	ebiten.SetTPS(1000)
 	// fmt.Println(rombytes)
 	// emulator.PrintROM(rombytes)
 

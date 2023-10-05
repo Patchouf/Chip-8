@@ -1,5 +1,7 @@
 package emulator
 
+import "fmt"
+
 type Cpu struct {
 	Memory      [4096]byte
 	Registre    [16]byte
@@ -14,6 +16,8 @@ type Cpu struct {
 
 	Key        [16]bool
 	WaitForKey bool
+
+	Opcode uint16
 }
 
 func (cpu *Cpu) initialiseFont() {
@@ -126,12 +130,13 @@ func InitCpu(cpu *Cpu, rombytes []byte) {
 
 // Update du cpu
 func (cpu *Cpu) Update() {
-	cpu.GetKey()// recupere la touche pressée (si il y en a une)
+	cpu.GetKey() // recupere la touche pressée (si il y en a une)
 	cpu.Pc += 2
 	op1 := cpu.Memory[cpu.Pc]
 	op2 := cpu.Memory[cpu.Pc+1]
-	opcode := cpu.uint8ToUint16(op1, op2)
-	cpu.Decode(opcode)
+	cpu.Opcode = cpu.uint8ToUint16(op1, op2)
+	// fmt.Printf("%x \n", cpu.Opcode)
+	cpu.Decode(cpu.Opcode)
 }
 
 // chargement du rom

@@ -20,9 +20,9 @@ func (c *Cpu) Decode(opcode uint16) {
 		default:
 		}
 	case 0x1000:
-		c.op1nnn(uint16(opcodeNNN))
+		c.op1nnn(opcodeNNN)
 	case 0x2000:
-		c.op2nnn(uint16(opcodeNNN))
+		c.op2nnn(opcodeNNN)
 	case 0x3000:
 		c.op3nnn(opcodeX, opcodeNN)
 	case 0x4000:
@@ -58,7 +58,7 @@ func (c *Cpu) Decode(opcode uint16) {
 	case 0x9000:
 		c.op9nn0(opcodeX, opcodeY)
 	case 0xA000:
-		c.opAnnn(uint16(opcodeNNN))
+		c.opAnnn(opcodeNNN)
 	case 0xB000:
 		c.opBnnn(opcodeNNN)
 	case 0xC000:
