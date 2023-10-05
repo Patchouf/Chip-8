@@ -126,18 +126,7 @@ func InitCpu(cpu *Cpu, rombytes []byte) {
 
 // Update du cpu
 func (cpu *Cpu) Update() {
-
-	if cpu.WaitForKey {
-		op1 := cpu.Memory[cpu.Pc]
-		op2 := cpu.Memory[cpu.Pc+1]
-		// fmt.Println(op1, " ", op2)
-		opcode := cpu.uint8ToUint16(op1, op2)
-		opcodeX := byte(opcode>>8) & 0x000F // Bits 8 à 11
-		cpu.GetKey(opcodeX)
-		return
-	}
-
-	cpu.GetKey(255)
+	cpu.GetKey()// recupere la touche pressée (si il y en a une)
 	if cpu.Delay_timer > 0 {
 		cpu.Delay_timer--
 	}
