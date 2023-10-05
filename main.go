@@ -30,7 +30,6 @@ func (g *Game) Update() error {
 
 // dessin des pixels du jeu
 func (g *Game) Draw(screen *ebiten.Image) {
-	// ebitenutil.DebugPrint(screen,"Hello")
 	for x, row := range g.cpu.Gfx {
 		for y, pixel := range row {
 			if pixel == 1 {

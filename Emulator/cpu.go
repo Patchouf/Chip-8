@@ -130,9 +130,7 @@ func (cpu *Cpu) Update() {
 	cpu.Pc += 2
 	op1 := cpu.Memory[cpu.Pc]
 	op2 := cpu.Memory[cpu.Pc+1]
-	// fmt.Println(op1, " ", op2)
 	opcode := cpu.uint8ToUint16(op1, op2)
-	// fmt.Printf("%02x \n", opcode)
 	cpu.Decode(opcode)
 }
 
@@ -165,7 +163,6 @@ func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
 	yIndex := y % 32
 	for i := x; i < x+8; i++ {
 		xIndex := i % 64
-
 		wasSet := c.Gfx[xIndex][yIndex] == 1
 		value := row >> (x + 8 - i - 1) & 0x01
 

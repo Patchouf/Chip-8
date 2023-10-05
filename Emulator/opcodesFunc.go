@@ -175,7 +175,7 @@ func (c *Cpu) op8xy5(opcodeX, opcodeY byte) {
 // Set Vx = Vx SHR 1. If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is
 // divided 	by 2
 func (c *Cpu) op8xy6(opcodeX, opcodeY byte) {
-	if (c.Registre[opcodeY]<< 7) == 1 {
+	if (c.Registre[opcodeX]%2) == 1 {
 		c.Registre[0xF] = 1
 	} else {
 		c.Registre[0xF] = 0
@@ -327,8 +327,7 @@ func (c *Cpu) opFx1E(opcodeX byte) {
 // Skip next instruction if key with the value of Vx is pressed. Checks the keyboard, and if the key corresponding
 // to the value of Vx is currently in the down position, PC is increased by 2
 func (c *Cpu) opEx9E(opcodeX byte) {
-	key := c.Registre[opcodeX]
-	if c.Key[key] {
+	if c.Key[c.Registre[opcodeX]] {
 		c.Pc += 2
 	}
 }
@@ -337,8 +336,7 @@ func (c *Cpu) opEx9E(opcodeX byte) {
 // Skip next instruction if key with the value of Vx is not pressed. Checks the keyboard, and if the key
 // corresponding to the value of Vx is currently in the up position, PC is increased by 2.
 func (c *Cpu) opExA1(opcodeX byte) {
-	key := c.Registre[opcodeX]
-	if !c.Key[key] {
+	if !c.Key[c.Registre[opcodeX]] {
 		c.Pc += 2
 	}
 }
