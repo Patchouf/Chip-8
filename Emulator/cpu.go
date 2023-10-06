@@ -1,16 +1,20 @@
 package emulator
 
+import "time"
+
 type Cpu struct {
-	Memory      [4096]byte
-	Registre    [16]byte
-	I           uint16
-	Pc          uint16
-	Gfx         [64][32]byte
+	Memory    [4096]byte
+	Registre  [16]byte
+	I         uint16
+	Pc        uint16
+	Gfx       [64][32]byte
+	Stack     [16]uint16
+	Sp        byte
+	Romlength uint16
+
 	Delay_timer byte
-	Stack       [16]uint16
-	Sp          byte
-	Romlength   uint16
 	Sound_timer byte
+	timeStart   time.Time
 
 	Key        [16]bool
 	WaitForKey bool
@@ -128,6 +132,15 @@ func InitCpu(cpu *Cpu, rombytes []byte) {
 
 // Update du cpu
 func (cpu *Cpu) Update() {
+	if time.Now().Sub(cpu.timeStart) > time.Second/14 { // when one second has past
+		if cpu.Delay_timer > 0 {
+			cpu.Delay_timer -= 1
+		}
+		if cpu.Sound_timer > 0 {
+			cpu.Sound_timer -= 1
+		}
+		cpu.timeStart = time.Now()
+	}
 	cpu.GetKey() // recupere la touche pressée (si il y en a une)
 	cpu.Pc += 2
 	op1 := cpu.Memory[cpu.Pc]
