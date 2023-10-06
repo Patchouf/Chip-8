@@ -1,42 +1,42 @@
 package emulator
 
 import (
-    "fmt"
-    "os"
+	"fmt"
+	"os"
 
-    "github.com/hajimehoshi/go-mp3"
-    "github.com/hajimehoshi/oto/v2"
+	"github.com/hajimehoshi/go-mp3"
+	"github.com/hajimehoshi/oto/v2"
 )
 
-func Song() error {
-    f, err := os.Open("Bip.mp3")
-    if err != nil {
-        return err
-    }
-    defer f.Close()
+func Song(songfile string) error {
+	f, err := os.Open(songfile + ".mp3")
+	if err != nil {
+		return err
+	}
+	defer f.Close()
 
-    d, err := mp3.NewDecoder(f)
-    if err != nil {
-        return err
-    }
+	d, err := mp3.NewDecoder(f)
+	if err != nil {
+		return err
+	}
 
-    c, ready, err := oto.NewContext(d.SampleRate(), 2, 2)
-    if err != nil {
-        return err
-    }
-    <-ready
+	c, ready, err := oto.NewContext(d.SampleRate(), 2, 2)
+	if err != nil {
+		return err
+	}
+	<-ready
 
-    p := c.NewPlayer(d)
-    defer p.Close()
-    p.Play()
+	p := c.NewPlayer(d)
+	defer p.Close()
+	p.Play()
 
-    fmt.Printf("Length: %d[bytes]\n", d.Length())
-    for {
-        // time.Sleep(time.Second)
-        if !p.IsPlaying() {
-            break
-        }
-    }
+	fmt.Printf("Length: %d[bytes]\n", d.Length())
+	for {
+		// time.Sleep(time.Second)
+		if !p.IsPlaying() {
+			break
+		}
+	}
 
-    return nil
+	return nil
 }
