@@ -2,12 +2,14 @@ module main
 
 go 1.19
 
-require github.com/hajimehoshi/ebiten/v2 v2.6.1
+require (
+	github.com/hajimehoshi/ebiten/v2 v2.6.1
+	github.com/hajimehoshi/go-mp3 v0.3.4
+	github.com/hajimehoshi/oto/v2 v2.3.1
+)
 
 require (
 	github.com/ebitengine/purego v0.5.0 // indirect
-	github.com/hajimehoshi/ebiten v1.12.12 // indirect
-	github.com/hajimehoshi/oto v0.6.8 // indirect
 	github.com/jezek/xgb v1.1.0 // indirect
 	golang.org/x/exp/shiny v0.0.0-20230905200255-921286631fa9 // indirect
 	golang.org/x/image v0.12.0 // indirect

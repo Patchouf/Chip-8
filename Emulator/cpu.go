@@ -137,6 +137,9 @@ func (cpu *Cpu) Update() {
 			cpu.Delay_timer -= 1
 		}
 		if cpu.Sound_timer > 0 {
+			if cpu.Sound_timer == 1 {
+				Song()
+			}
 			cpu.Sound_timer -= 1
 		}
 		cpu.timeStart = time.Now()
