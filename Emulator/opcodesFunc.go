@@ -12,8 +12,7 @@ func (c *Cpu) StackPush(address uint16) {
 
 func (c *Cpu) StackPop() uint16 {
 	c.Sp--
-	address := c.Stack[c.Sp]
-	return address
+	return c.Stack[c.Sp]
 }
 
 // Opcode 00E0 - Effacer l'écran =
