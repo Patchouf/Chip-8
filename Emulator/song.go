@@ -8,8 +8,8 @@ import (
 	"github.com/hajimehoshi/oto/v2"
 )
 
-func Song() error {
-	f, err := os.Open("Bip.mp3")
+func Song(songfile string) error {
+	f, err := os.Open(songfile + ".mp3")
 	if err != nil {
 		return err
 	}
@@ -32,6 +32,7 @@ func Song() error {
 
 	fmt.Printf("Length: %d[bytes]\n", d.Length())
 	for {
+		// time.Sleep(time.Second)
 		if !p.IsPlaying() {
 			break
 		}

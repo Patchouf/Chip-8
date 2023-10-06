@@ -1,6 +1,9 @@
 package emulator
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 type Cpu struct {
 	Memory    [4096]byte
@@ -133,12 +136,15 @@ func InitCpu(cpu *Cpu, rombytes []byte) {
 // Update du cpu
 func (cpu *Cpu) Update() {
 	if time.Now().Sub(cpu.timeStart) > time.Second/16 { // when one second has past
+		fmt.Println(cpu.Sound_timer)
 		if cpu.Delay_timer > 0 {
 			cpu.Delay_timer -= 1
 		}
 		if cpu.Sound_timer > 0 {
 			if cpu.Sound_timer == 1 {
-				Song()
+				Song("Beep")
+			} else if cpu.Sound_timer == 30 {
+				Song("Over")
 			}
 			cpu.Sound_timer -= 1
 		}
