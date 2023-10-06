@@ -132,7 +132,7 @@ func InitCpu(cpu *Cpu, rombytes []byte) {
 
 // Update du cpu
 func (cpu *Cpu) Update() {
-	if time.Now().Sub(cpu.timeStart) > time.Second/14 { // when one second has past
+	if time.Now().Sub(cpu.timeStart) > time.Second/16 { // when one second has past
 		if cpu.Delay_timer > 0 {
 			cpu.Delay_timer -= 1
 		}

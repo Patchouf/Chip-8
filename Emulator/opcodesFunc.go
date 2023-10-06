@@ -175,7 +175,7 @@ func (c *Cpu) op8xy5(opcodeX, opcodeY byte) {
 // Set Vx = Vx SHR 1. If the least-significant bit of Vx is 1, then VF is set to 1, otherwise 0. Then Vx is
 // divided 	by 2
 func (c *Cpu) op8xy6(opcodeX, opcodeY byte) {
-	if (c.Registre[opcodeX]%2) == 1 {
+	if (c.Registre[opcodeX] % 2) == 1 {
 		c.Registre[0xF] = 1
 	} else {
 		c.Registre[0xF] = 0
