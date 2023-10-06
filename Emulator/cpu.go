@@ -1,7 +1,6 @@
 package emulator
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -136,7 +135,6 @@ func InitCpu(cpu *Cpu, rombytes []byte) {
 // Update du cpu
 func (cpu *Cpu) Update() {
 	if time.Now().Sub(cpu.timeStart) > time.Second/16 { // when one second has past
-		fmt.Println(cpu.Sound_timer)
 		if cpu.Delay_timer > 0 {
 			cpu.Delay_timer -= 1
 		}
@@ -155,7 +153,6 @@ func (cpu *Cpu) Update() {
 	op1 := cpu.Memory[cpu.Pc]
 	op2 := cpu.Memory[cpu.Pc+1]
 	cpu.Opcode = cpu.uint8ToUint16(op1, op2)
-	// fmt.Printf("%x \n", cpu.Opcode)
 	cpu.Decode(cpu.Opcode)
 }
 
