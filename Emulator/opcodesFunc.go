@@ -2,6 +2,7 @@ package emulator
 
 import (
 	"math/rand"
+	"time"
 )
 
 func (c *Cpu) StackPush(address uint16) {
@@ -348,6 +349,7 @@ func (c *Cpu) opFx0A(opcodeX byte) {
 	c.GetKey()
 	for i := 0; i < len(c.Key); i++ {
 		if c.Key[i] {
+			time.Sleep(time.Second / 5)
 			c.Registre[i] = opcodeX
 			c.WaitForKey = false
 		}

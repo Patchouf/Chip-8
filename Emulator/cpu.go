@@ -190,9 +190,10 @@ func (c *Cpu) DrawSprite(x byte, y byte, row byte) bool {
 
 		c.Gfx[xIndex][yIndex] ^= value
 
-		if wasSet && c.Gfx[xIndex][yIndex] == 0 {
-			erased = true
+			if wasSet && c.Gfx[xIndex][yIndex] == 0 {
+				erased = true
+			}
 		}
+		return erased
 	}
-	return erased
-}
+
