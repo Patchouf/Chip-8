@@ -1,6 +1,7 @@
 package emulator
 
 import (
+	"fmt"
 	"math/rand"
 	"time"
 )
@@ -349,7 +350,7 @@ func (c *Cpu) opFx0A(opcodeX byte) {
 	c.GetKey()
 	for i := 0; i < len(c.Key); i++ {
 		if c.Key[i] {
-			time.Sleep(time.Second / 5)
+			time.Sleep(time.Second)
 			c.Registre[i] = opcodeX
 			c.WaitForKey = false
 		}
