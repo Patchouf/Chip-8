@@ -1,7 +1,6 @@
 package emulator
 
 import (
-	"fmt"
 	"math/rand"
 	"time"
 )
